@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Arcade Hub</title>
+  <title>Game Hub</title>
   <style>
     :root{
       --bg0:#070b14; --bg1:#0b1122; --bg2:#111b36;
@@ -153,7 +153,7 @@
     <div class="top">
       <div class="brand">
         <div class="mark">AH</div>
-        <div><h1>Arcade Hub</h1><p>GitHub Pages front end with free shared rooms and turn enforcement</p></div>
+        <div><h1>Game Hub</h1><p>GitHub Pages front end with free shared rooms and turn enforcement</p></div>
       </div>
       <div class="top-actions">
         <span id="status" class="pill">Ready</span>
@@ -163,7 +163,7 @@
     <div id="app"></div>
   </div>
 <script>
-const CONFIG = { backendUrl: "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE" };
+const CONFIG = { backendUrl: "https://script.google.com/macros/s/AKfycby2U1FkwT81mcVy4w2XFDqlnOdylL8PfDDJUrkj9UjeMnOgxf41MMb9pWrz4e3innYp/exec"" };
 const SOLO_WORDS = { easy:['PLANE','TRAIN','APPLE','STONE','GRASS','BREAD','SHORE','SMILE','CLOUD','WATER'], medium:['CIPHER','PLANET','POCKET','MOTION','RIDDLE','ORANGE','MARKET','SPRING','VELVET','SHADOW'], hard:['QUARTZ','JUNGLE','MURKY','EXHALE','VYING','OBJECT','WIZARD','TROPHY','PYTHON','TANGLE'] };
 const CROSSWORDS = [{ name:'City & Nature', grid:[['C','L','O','U','D'],['A',null,'R',null,'R'],['N','E','S','T',null],['D',null,'T',null,'A'],['Y','A','R','D','S']], clues:{ across:['White thing in the sky after rain (5)','Bird home (4)','Outdoor space around a house (5)'], down:['Sweet treat / candy land (5)','Opposite of up, in some contexts (5)','To support or hold (5)'] } },{ name:'Everyday Mix', grid:[['S','T','A','R',null],['T',null,'O',null,'P'],['O','N','E',null,'E'],[null,null,'N',null,'A'],['R','A','I','N',null]], clues:{ across:['Shines in the night sky (4)','The number before two (3)','Weather from the clouds (4)'], down:['A dramatic water body clue (5)','To move downward or to the side (4)','The center of a target (4)'] } }];
 const PIECES = { w:{k:'♔', q:'♕', r:'♖', b:'♗', n:'♘', p:'♙'}, b:{k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟'} };
