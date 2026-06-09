@@ -1,0 +1,1649 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Hub</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #111936;
+      --panel-2: #162244;
+      --line: rgba(255,255,255,.12);
+      --text: #eef2ff;
+      --muted: #aab6e8;
+      --accent: #7c9cff;
+      --accent-2: #70e1b5;
+      --danger: #ff7c90;
+      --gold: #ffd166;
+      --shadow: 0 20px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+      --radius-sm: 12px;
+      --cell: 42px;
+      font-synthesis-weight: none;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top left, rgba(124,156,255,.18), transparent 34%),
+        radial-gradient(circle at top right, rgba(112,225,181,.12), transparent 30%),
+        linear-gradient(180deg, #0a0f1d, #090d18 65%, #070b12);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    button, input, select, textarea {
+      font: inherit;
+    }
+    button {
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease, opacity .12s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    a { color: inherit; }
+    .wrap {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(124,156,255,.95), rgba(112,225,181,.85));
+      color: #06101d;
+      font-weight: 900;
+      box-shadow: var(--shadow);
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: .02em;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: .93rem;
+    }
+    .chrome {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .pill, .ghost, .primary, .danger, .tab, .tile, .cell, .chip {
+      border-radius: 14px;
+    }
+    .pill {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 10px 14px;
+    }
+    .ghost, .primary, .danger, .tab {
+      padding: 10px 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+    .primary {
+      background: linear-gradient(135deg, rgba(124,156,255,.95), rgba(106,126,255,.85));
+      border-color: rgba(124,156,255,.35);
+      color: white;
+      font-weight: 700;
+    }
+    .danger {
+      background: rgba(255,124,144,.1);
+      border-color: rgba(255,124,144,.28);
+      color: #ffd6dd;
+    }
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+    .home-grid {
+      grid-template-columns: 1.2fr .8fr;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-hd {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 18px 18px 0;
+      flex-wrap: wrap;
+    }
+    .panel-body { padding: 18px; }
+    .hero {
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(112,225,181,.16), transparent 22%),
+        radial-gradient(circle at top left, rgba(124,156,255,.18), transparent 30%),
+        linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+    .hero h2 { margin: 0 0 8px; font-size: clamp(1.8rem, 2.7vw, 3.2rem); }
+    .hero p { margin: 0; color: var(--muted); max-width: 70ch; line-height: 1.55; }
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1rem;
+      color: #dbe4ff;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card {
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 150px;
+    }
+    .card h3 { margin: 0; font-size: 1.05rem; }
+    .card p { margin: 0; color: var(--muted); line-height: 1.5; font-size: .95rem; }
+    .card .row { margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      background: rgba(124,156,255,.14);
+      color: #dce4ff;
+      border: 1px solid rgba(124,156,255,.24);
+      padding: 6px 10px;
+      font-size: .82rem;
+    }
+    .badge.green { background: rgba(112,225,181,.12); border-color: rgba(112,225,181,.24); }
+    .badge.gold { background: rgba(255,209,102,.12); border-color: rgba(255,209,102,.24); }
+    .game-shell {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+    }
+    .game-main, .game-side {
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .game-main { min-height: 720px; }
+    .game-side { padding: 16px; }
+    .game-head {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .game-head h2 { margin: 0; font-size: 1.22rem; }
+    .game-head .sub { color: var(--muted); font-size: .92rem; margin-top: 4px; }
+    .game-body { padding: 18px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tab.active { background: rgba(124,156,255,.16); border-color: rgba(124,156,255,.36); }
+    .toolbar, .controls, .stack { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .stack { flex-direction: column; align-items: stretch; }
+    .field {
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--line);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 0;
+    }
+    .field:focus { outline: 2px solid rgba(124,156,255,.5); outline-offset: 1px; }
+    .muted { color: var(--muted); }
+    .small { font-size: .92rem; }
+    .board-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .board {
+      display: grid;
+      gap: 0;
+      user-select: none;
+      width: fit-content;
+      max-width: 100%;
+    }
+    .cell {
+      width: var(--cell);
+      height: var(--cell);
+      border: 1px solid rgba(255,255,255,.1);
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.03);
+      color: var(--text);
+      font-weight: 700;
+      padding: 0;
+    }
+    .cell.dark { background: rgba(255,255,255,.08); }
+    .cell.light { background: rgba(255,255,255,.03); }
+    .cell.selected { outline: 2px solid rgba(124,156,255,.9); outline-offset: -2px; }
+    .cell.target { background: rgba(112,225,181,.14); }
+    .cell.hint { background: rgba(255,209,102,.12); }
+    .cell.block { background: rgba(255,255,255,.08); color: transparent; }
+    .cell.input { font-size: 1rem; }
+    .cell.input input {
+      width: 100%; height: 100%; border: 0; background: transparent; color: var(--text);
+      text-align: center; font-size: 1rem; font-weight: 800; text-transform: uppercase;
+    }
+    .cell.input input:focus { outline: none; }
+    .kbd {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 8px;
+      max-width: 520px;
+    }
+    .kbd button { min-height: 42px; }
+    .wordle-grid {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 8px;
+      margin: 14px 0 16px;
+    }
+    .guess-row {
+      display: grid;
+      grid-template-columns: repeat(5, 52px);
+      gap: 8px;
+    }
+    .letter {
+      width: 52px; height: 52px; display: grid; place-items: center;
+      border-radius: 12px; border: 1px solid var(--line); background: rgba(255,255,255,.04);
+      font-size: 1.15rem; font-weight: 900;
+    }
+    .letter.green { background: rgba(112,225,181,.18); border-color: rgba(112,225,181,.4); }
+    .letter.gold { background: rgba(255,209,102,.16); border-color: rgba(255,209,102,.4); }
+    .letter.gray { background: rgba(255,255,255,.08); color: #d2d8ee; }
+    .mini-kbd {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 6px;
+      max-width: 700px;
+    }
+    .mini-kbd button { min-height: 38px; padding: 0; font-size: .9rem; }
+    .crossword {
+      display: grid;
+      gap: 6px;
+      width: fit-content;
+      margin-bottom: 14px;
+    }
+    .crossword .cell {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .crossword .cell input {
+      width: 100%; height: 100%; border: 0; background: transparent; color: var(--text);
+      text-transform: uppercase; text-align: center; font-weight: 900; font-size: 1rem;
+    }
+    .clues {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .clue-box {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+      background: rgba(255,255,255,.04);
+    }
+    .clue-box h4 { margin: 0 0 8px; }
+    .clue-box ol { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.5; }
+    .tic-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 92px);
+      gap: 10px;
+    }
+    .tic-grid .cell {
+      width: 92px; height: 92px; font-size: 2rem;
+      background: rgba(255,255,255,.04);
+      border-radius: 16px;
+    }
+    .connect-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 62px);
+      gap: 8px;
+      background: rgba(15,22,44,.65);
+      padding: 10px;
+      border-radius: 18px;
+      width: fit-content;
+      border: 1px solid var(--line);
+    }
+    .connect-cell {
+      width: 62px; height: 62px; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      display: grid; place-items: center;
+      font-size: 1.8rem; font-weight: 900;
+    }
+    .checkers-grid, .chess-grid, .battle-grid {
+      display: grid;
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+    .checkers-grid .cell,
+    .chess-grid .cell,
+    .battle-grid .cell {
+      border-radius: 0;
+      width: 56px;
+      height: 56px;
+    }
+    .piece {
+      font-size: 1.8rem;
+      line-height: 1;
+      display: grid;
+      place-items: center;
+      width: 100%; height: 100%;
+    }
+    .piece.red { color: #ff7a90; }
+    .piece.black { color: #e7ecff; }
+    .piece.w { color: #eef2ff; }
+    .piece.b { color: #ff7a90; }
+    .footer-note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.5;
+    }
+    .hr {
+      height: 1px;
+      background: var(--line);
+      margin: 14px 0;
+    }
+    .list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .notice {
+      border: 1px solid rgba(255,209,102,.24);
+      background: rgba(255,209,102,.08);
+      color: #ffe8b0;
+      padding: 12px 14px;
+      border-radius: 14px;
+      line-height: 1.45;
+    }
+    @media (max-width: 1100px) {
+      .home-grid, .game-shell { grid-template-columns: 1fr; }
+      .game-main { min-height: auto; }
+    }
+    @media (max-width: 720px) {
+      .cards { grid-template-columns: 1fr; }
+      .clues { grid-template-columns: 1fr; }
+      :root { --cell: 36px; }
+      .tic-grid { grid-template-columns: repeat(3, 76px); }
+      .tic-grid .cell { width: 76px; height: 76px; }
+      .connect-grid { grid-template-columns: repeat(7, 48px); }
+      .connect-cell { width: 48px; height: 48px; }
+      .checkers-grid .cell, .chess-grid .cell, .battle-grid .cell { width: 42px; height: 42px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">AH</div>
+        <div>
+          <h1>Game Hub</h1>
+          <p>Static, free, GitHub Pages-friendly game platform</p>
+        </div>
+      </div>
+      <div class="chrome">
+        <span id="statusPill" class="pill">Ready</span>
+        <button id="homeBtn" class="ghost" style="display:none;">Home</button>
+      </div>
+    </div>
+
+    <div id="app"></div>
+  </div>
+
+  <script>
+    const APP_TITLE = 'Game Hub';
+    const WORDS = {
+      easy: ['PLANE','TRAIN','APPLE','STONE','GRASS','BREAD','SHORE','SMILE','CLOUD','WATER'],
+      medium: ['CIPHER','PLANET','POCKET','MOTION','RIDDLE','ORANGE','MARKET','SPRING','VELVET','SHADOW'],
+      hard: ['QUARTZ','JUNGLE','MURKY','EXHALE','VYING','OBJECT','WIZARD','TROPHY','PYTHON','TANGLE']
+    };
+
+    const CROSSWORD_PUZZLES = [
+      {
+        name: 'City & Nature',
+        grid: [
+          ['C','L','O','U','D'],
+          ['A',null,'R',null,'R'],
+          ['N','E','S','T',null],
+          ['D',null,'T',null,'A'],
+          ['Y','A','R','D','S']
+        ],
+        clues: {
+          across: [
+            '1. White thing in the sky after rain (5)',
+            '3. Bird home (4)',
+            '4. Outdoor space around a house (5)'
+          ],
+          down: [
+            '1. Sweet treat / or a classic answer to “candy land” (5)',
+            '2. Opposite of up, in some contexts (5)',
+            '3. To support or hold (5)'
+          ]
+        }
+      },
+      {
+        name: 'Everyday Mix',
+        grid: [
+          ['S','T','A','R',null],
+          ['T',null,'O',null,'P'],
+          ['O','N','E',null,'E'],
+          [null,null,'N',null,'A'],
+          ['R','A','I','N',null]
+        ],
+        clues: {
+          across: [
+            '1. Shines in the night sky (4)',
+            '2. The number before two (3)',
+            '3. Weather from the clouds (4)'
+          ],
+          down: [
+            '1. A large body of water? Not quite — this one is a little dramatic (5)',
+            '2. To move downward or to the side (4)',
+            '3. The center of a target or the middle letter in a word (4)'
+          ]
+        }
+      }
+    ];
+
+    const PIECES = { w: { k: '♔', q: '♕', r: '♖', b: '♗', n: '♘', p: '♙' }, b: { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' } };
+    const CHESS_VALUES = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+    const state = {
+      screen: 'home',
+      active: null,
+      solo: {
+        sudoku: null,
+        wordle: null,
+        crossword: null
+      },
+      multi: {
+        ttt: null,
+        connect4: null,
+        checkers: null,
+        chess: null,
+        battleship: null
+      },
+      selected: null,
+      message: '',
+      roomLink: ''
+    };
+
+    const app = document.getElementById('app');
+    const statusPill = document.getElementById('statusPill');
+    const homeBtn = document.getElementById('homeBtn');
+
+    function setStatus(msg) {
+      state.message = msg;
+      statusPill.textContent = msg || 'Ready';
+    }
+
+    function urlSafeEncode(obj) {
+      const json = JSON.stringify(obj);
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+    }
+
+    function urlSafeDecode(str) {
+      try {
+        const b64 = str.replace(/-/g, '+').replace(/_/g, '/');
+        const pad = b64.length % 4 ? '='.repeat(4 - (b64.length % 4)) : '';
+        const json = decodeURIComponent(escape(atob(b64 + pad)));
+        return JSON.parse(json);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateUrlState() {
+      const packed = urlSafeEncode({ screen: state.screen, active: state.active, solo: state.solo, multi: state.multi });
+      const url = new URL(window.location.href);
+      url.searchParams.set('data', packed);
+      history.replaceState(null, '', url.toString());
+      state.roomLink = url.toString();
+    }
+
+    function saveAndRender(msg) {
+      if (msg) setStatus(msg);
+      updateUrlState();
+      render();
+    }
+
+    function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function choice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function uniqueRandom(arr, count) {
+      return shuffle(arr).slice(0, count);
+    }
+
+    function makeSudokuSolution() {
+      const base = 3;
+      const side = base * base;
+      const pattern = (r, c) => (base * (r % base) + Math.floor(r / base) + c) % side;
+      const rBase = [...Array(base).keys()];
+      const rows = shuffle(rBase).flatMap(g => shuffle(rBase).map(r => g * base + r));
+      const cols = shuffle(rBase).flatMap(g => shuffle(rBase).map(c => g * base + c));
+      const nums = shuffle([1,2,3,4,5,6,7,8,9]);
+      const board = Array.from({length: side}, (_, r) => Array.from({length: side}, (_, c) => nums[pattern(rows[r], cols[c]) ]));
+      return board;
+    }
+
+    function initSudoku(difficulty = 'medium') {
+      const solution = makeSudokuSolution();
+      const holes = { easy: 34, medium: 44, hard: 52 }[difficulty] ?? 44;
+      const board = solution.map(row => row.slice());
+      const cells = shuffle([...Array(81).keys()]).slice(0, holes);
+      cells.forEach(i => board[Math.floor(i/9)][i%9] = null);
+      state.solo.sudoku = {
+        difficulty,
+        board,
+        solution,
+        fixed: board.map(row => row.map(v => v !== null)),
+        selected: [0,0],
+        complete: false
+      };
+      setStatus(`Sudoku ${difficulty} loaded`);
+      saveAndRender();
+    }
+
+    function sudokuIsSolved(s) {
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 9; c++) {
+          if (s.board[r][c] !== s.solution[r][c]) return false;
+        }
+      }
+      return true;
+    }
+
+    function initWordle(difficulty = 'medium') {
+      const answer = choice(WORDS[difficulty]);
+      state.solo.wordle = {
+        difficulty,
+        answer,
+        rows: Array.from({length: 6}, () => Array(5).fill('')),
+        currentRow: 0,
+        currentCol: 0,
+        result: Array.from({length: 6}, () => Array(5).fill('')),
+        won: false,
+        lost: false,
+        typed: ''
+      };
+      setStatus(`Wordle ${difficulty} loaded`);
+      saveAndRender();
+    }
+
+    function initCrossword(index = 0) {
+      state.solo.crossword = {
+        index,
+        puzzle: clone(CROSSWORD_PUZZLES[index]),
+        cells: CROSSWORD_PUZZLES[index].grid.map(row => row.map(v => (v ? '' : null))),
+        solved: false
+      };
+      setStatus(`Crossword loaded: ${CROSSWORD_PUZZLES[index].name}`);
+      saveAndRender();
+    }
+
+    function initTicTacToe() {
+      state.multi.ttt = { board: Array(9).fill(''), turn: 'X', winner: '', room: makeRoomSeed('ttt') };
+      setStatus('Tic-Tac-Toe room created');
+      saveAndRender();
+    }
+
+    function initConnect4() {
+      state.multi.connect4 = { board: Array.from({length: 6}, () => Array(7).fill('')), turn: 'R', winner: '', room: makeRoomSeed('c4') };
+      setStatus('Connect Four room created');
+      saveAndRender();
+    }
+
+    function initCheckers() {
+      const board = Array.from({length: 8}, (_, r) => Array.from({length: 8}, (_, c) => null));
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 8; c++) if ((r+c)%2===1) board[r][c] = 'b';
+      for (let r = 5; r < 8; r++) for (let c = 0; c < 8; c++) if ((r+c)%2===1) board[r][c] = 'r';
+      state.multi.checkers = { board, turn: 'r', selected: null, winner: '', forced: [], room: makeRoomSeed('chk') };
+      setStatus('Checkers room created');
+      saveAndRender();
+    }
+
+    function initChess() {
+      const back = ['r','n','b','q','k','b','n','r'];
+      const board = Array.from({length: 8}, () => Array(8).fill(null));
+      for (let c = 0; c < 8; c++) {
+        board[0][c] = { t: back[c], c: 'b' };
+        board[1][c] = { t: 'p', c: 'b' };
+        board[6][c] = { t: 'p', c: 'w' };
+        board[7][c] = { t: back[c], c: 'w' };
+      }
+      state.multi.chess = { board, turn: 'w', selected: null, legal: [], winner: '', status: 'White to move', room: makeRoomSeed('chess') };
+      setStatus('Chess room created');
+      saveAndRender();
+    }
+
+    function initBattleship() {
+      const createSide = () => ({
+        board: Array.from({length: 6}, () => Array(6).fill('')),
+        ships: [],
+        shots: Array.from({length: 6}, () => Array(6).fill('')),
+        placed: false
+      });
+      state.multi.battleship = {
+        players: { r: createSide(), b: createSide() },
+        phase: 'place',
+        turn: 'r',
+        orient: 'H',
+        shipSizes: [3,2,2],
+        shipIndex: 0,
+        winner: '',
+        room: makeRoomSeed('btl')
+      };
+      setStatus('Battleship room created');
+      saveAndRender();
+    }
+
+    function makeRoomSeed(prefix) {
+      return prefix + '-' + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-4);
+    }
+
+    function goHome() {
+      state.screen = 'home';
+      state.active = null;
+      state.selected = null;
+      setStatus('Ready');
+      updateUrlState();
+      render();
+    }
+
+    function openSolo(name) {
+      state.screen = 'solo';
+      state.active = name;
+      if (name === 'sudoku' && !state.solo.sudoku) initSudoku('medium');
+      if (name === 'wordle' && !state.solo.wordle) initWordle('medium');
+      if (name === 'crossword' && !state.solo.crossword) initCrossword(0);
+      saveAndRender();
+    }
+
+    function openMulti(name) {
+      state.screen = 'multi';
+      state.active = name;
+      if (name === 'ttt' && !state.multi.ttt) initTicTacToe();
+      if (name === 'connect4' && !state.multi.connect4) initConnect4();
+      if (name === 'checkers' && !state.multi.checkers) initCheckers();
+      if (name === 'chess' && !state.multi.chess) initChess();
+      if (name === 'battleship' && !state.multi.battleship) initBattleship();
+      saveAndRender();
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(state.roomLink || window.location.href).then(() => setStatus('Room link copied')).catch(() => setStatus('Copy failed'));
+    }
+
+    function setSudokuValue(r, c, val) {
+      const s = state.solo.sudoku;
+      if (!s || s.fixed[r][c]) return;
+      s.board[r][c] = val ? Number(val) : null;
+      s.complete = sudokuIsSolved(s);
+      state.solo.sudoku = s;
+      saveAndRender(s.complete ? 'Sudoku solved' : 'Sudoku updated');
+    }
+
+    function selectSudokuCell(r, c) {
+      const s = state.solo.sudoku;
+      if (!s) return;
+      s.selected = [r,c];
+      saveAndRender();
+    }
+
+    function sudokuInput(n) {
+      const s = state.solo.sudoku;
+      if (!s) return;
+      const [r,c] = s.selected || [0,0];
+      setSudokuValue(r,c,n);
+    }
+
+    function sudokuBackspace() {
+      const s = state.solo.sudoku;
+      if (!s) return;
+      const [r,c] = s.selected || [0,0];
+      if (s.fixed[r][c]) return;
+      s.board[r][c] = null;
+      s.complete = sudokuIsSolved(s);
+      saveAndRender();
+    }
+
+    function wordleLetter(ch) {
+      const w = state.solo.wordle;
+      if (!w || w.won || w.lost) return;
+      if (w.currentCol < 5) {
+        w.rows[w.currentRow][w.currentCol] = ch;
+        w.currentCol++;
+        saveAndRender();
+      }
+    }
+
+    function wordleBackspace() {
+      const w = state.solo.wordle;
+      if (!w || w.won || w.lost) return;
+      if (w.currentCol > 0) {
+        w.currentCol--;
+        w.rows[w.currentRow][w.currentCol] = '';
+        saveAndRender();
+      }
+    }
+
+    function wordleSubmit() {
+      const w = state.solo.wordle;
+      if (!w || w.won || w.lost) return;
+      if (w.currentCol < 5) return setStatus('Need 5 letters');
+      const guess = w.rows[w.currentRow].join('').toUpperCase();
+      const answer = w.answer.toUpperCase();
+      const result = Array(5).fill('gray');
+      const pool = answer.split('');
+      // greens first
+      for (let i=0;i<5;i++) {
+        if (guess[i] === answer[i]) { result[i] = 'green'; pool[i] = null; }
+      }
+      for (let i=0;i<5;i++) {
+        if (result[i] === 'green') continue;
+        const idx = pool.indexOf(guess[i]);
+        if (idx !== -1) { result[i] = 'gold'; pool[idx] = null; }
+      }
+      w.result[w.currentRow] = result;
+      if (guess === answer) w.won = true;
+      else if (w.currentRow === 5) w.lost = true;
+      else { w.currentRow++; w.currentCol = 0; }
+      saveAndRender(w.won ? 'Wordle solved' : (w.lost ? `Answer: ${w.answer}` : 'Guess recorded'));
+    }
+
+    function crosswordSet(r,c,val) {
+      const x = state.solo.crossword;
+      if (!x || x.puzzle.grid[r][c] === null) return;
+      x.cells[r][c] = (val || '').toUpperCase().slice(0,1);
+      x.solved = crosswordSolved(x);
+      saveAndRender(x.solved ? 'Crossword solved' : 'Crossword updated');
+    }
+
+    function crosswordSolved(x) {
+      for (let r = 0; r < x.puzzle.grid.length; r++) {
+        for (let c = 0; c < x.puzzle.grid[r].length; c++) {
+          const sol = x.puzzle.grid[r][c];
+          if (sol !== null && x.cells[r][c] !== sol) return false;
+        }
+      }
+      return true;
+    }
+
+    function tttMove(i) {
+      const g = state.multi.ttt;
+      if (!g || g.winner || g.board[i]) return;
+      g.board[i] = g.turn;
+      const lines = [
+        [0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]
+      ];
+      const winLine = lines.find(([a,b,c]) => g.board[a] && g.board[a] === g.board[b] && g.board[a] === g.board[c]);
+      if (winLine) g.winner = g.turn;
+      else if (g.board.every(Boolean)) g.winner = 'D';
+      else g.turn = g.turn === 'X' ? 'O' : 'X';
+      saveAndRender(g.winner === 'D' ? 'Tic-Tac-Toe draw' : (g.winner ? `${g.winner} wins` : 'Move made'));
+    }
+
+    function connectMove(col) {
+      const g = state.multi.connect4;
+      if (!g || g.winner) return;
+      for (let r = 5; r >= 0; r--) {
+        if (!g.board[r][col]) {
+          g.board[r][col] = g.turn;
+          if (checkConnectWinner(g.board, r, col, g.turn)) g.winner = g.turn;
+          else if (g.board.every(row => row.every(Boolean))) g.winner = 'D';
+          else g.turn = g.turn === 'R' ? 'Y' : 'R';
+          saveAndRender(g.winner === 'D' ? 'Connect Four draw' : (g.winner ? `${g.winner} wins` : 'Token dropped'));
+          return;
+        }
+      }
+      setStatus('Column full');
+    }
+
+    function checkConnectWinner(board, r, c, p) {
+      const dirs = [[1,0],[0,1],[1,1],[1,-1]];
+      for (const [dr,dc] of dirs) {
+        let count = 1;
+        for (const sign of [1,-1]) {
+          let nr = r + dr*sign, nc = c + dc*sign;
+          while (board[nr] && board[nr][nc] === p) { count++; nr += dr*sign; nc += dc*sign; }
+        }
+        if (count >= 4) return true;
+      }
+      return false;
+    }
+
+    function checkersPieceSide(piece) { return piece?.toLowerCase() === 'r' ? 'r' : piece?.toLowerCase() === 'b' ? 'b' : null; }
+    function checkersIsKing(piece) { return piece === piece?.toUpperCase() && piece; }
+
+    function checkersMovesFor(board, r, c) {
+      const piece = board[r][c];
+      if (!piece) return [];
+      const side = piece.toLowerCase();
+      const dirs = [];
+      if (piece === 'r' || piece === 'R') dirs.push([-1,-1], [-1,1]);
+      if (piece === 'b' || piece === 'B') dirs.push([1,-1], [1,1]);
+      if (piece === 'R' || piece === 'B') {
+        if (piece === 'R') dirs.push([1,-1], [1,1]);
+        if (piece === 'B') dirs.push([-1,-1], [-1,1]);
+      }
+      const moves = [];
+      for (const [dr,dc] of dirs) {
+        const nr = r + dr, nc = c + dc;
+        const jr = r + dr*2, jc = c + dc*2;
+        if (inside(nr,nc) && !board[nr][nc]) moves.push({r:nr,c:nc,capture:null});
+        if (inside(jr,jc) && board[nr][nc] && checkersPieceSide(board[nr][nc]) !== side && !board[jr][jc]) {
+          moves.push({r:jr,c:jc,capture:[nr,nc]});
+        }
+      }
+      return moves;
+    }
+
+    function checkersAllCaptures(board, side) {
+      const caps = [];
+      for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+        const p = board[r][c];
+        if (p && checkersPieceSide(p) === side) {
+          for (const m of checkersMovesFor(board,r,c)) if (m.capture) caps.push({from:[r,c], ...m});
+        }
+      }
+      return caps;
+    }
+
+    function checkersMove(r,c) {
+      const g = state.multi.checkers;
+      if (!g || g.winner) return;
+      const piece = g.board[r][c];
+      if (g.selected) {
+        const [sr,sc] = g.selected;
+        const options = checkersMovesFor(g.board,sr,sc);
+        const move = options.find(m => m.r===r && m.c===c);
+        if (move) {
+          g.board[r][c] = g.board[sr][sc];
+          g.board[sr][sc] = null;
+          if (move.capture) g.board[move.capture[0]][move.capture[1]] = null;
+          if (g.board[r][c] === 'r' && r === 0) g.board[r][c] = 'R';
+          if (g.board[r][c] === 'b' && r === 7) g.board[r][c] = 'B';
+          const moreCaps = move.capture ? checkersMovesFor(g.board,r,c).filter(m => m.capture).length : 0;
+          const side = g.turn;
+          if (moreCaps) {
+            g.selected = [r,c];
+            g.forced = [r,c];
+            setStatus('Capture again');
+          } else {
+            g.selected = null;
+            g.forced = [];
+            g.turn = g.turn === 'r' ? 'b' : 'r';
+            setStatus('Checkers move made');
+          }
+          const enemy = g.turn;
+          const enemyPieces = g.board.flat().filter(p => p && checkersPieceSide(p) === enemy).length;
+          const myPieces = g.board.flat().filter(p => p && checkersPieceSide(p) === side).length;
+          if (enemyPieces === 0) g.winner = side;
+          saveAndRender(g.winner ? `${g.winner.toUpperCase()} wins` : 'Checkers updated');
+          return;
+        }
+      }
+      if (piece && checkersPieceSide(piece) === g.turn) {
+        g.selected = [r,c];
+        saveAndRender();
+      }
+    }
+
+    function inside(r,c) { return r>=0 && c>=0 && r<8 && c<8; }
+
+    function chessPieceAt(board, r, c) { return board[r]?.[c]; }
+    function chessSide(piece) { return piece?.c || null; }
+    function chessType(piece) { return piece?.t || null; }
+
+    function cloneChessBoard(board) {
+      return board.map(row => row.map(p => p ? {t:p.t, c:p.c} : null));
+    }
+
+    function findKing(board, side) {
+      for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+        const p = board[r][c];
+        if (p && p.t === 'k' && p.c === side) return [r,c];
+      }
+      return null;
+    }
+
+    function isSquareAttacked(board, r, c, bySide) {
+      for (let sr=0; sr<8; sr++) for (let sc=0; sc<8; sc++) {
+        const p = board[sr][sc];
+        if (!p || p.c !== bySide) continue;
+        const moves = pseudoChessMoves(board, sr, sc, true);
+        if (moves.some(m => m.r === r && m.c === c)) return true;
+      }
+      return false;
+    }
+
+    function pseudoChessMoves(board, r, c, attackOnly = false) {
+      const p = board[r][c];
+      if (!p) return [];
+      const side = p.c;
+      const opp = side === 'w' ? 'b' : 'w';
+      const moves = [];
+      const add = (nr,nc, captureOk = true) => {
+        if (!inside(nr,nc)) return;
+        const t = board[nr][nc];
+        if (!t) moves.push({r:nr,c:nc});
+        else if (captureOk && t.c !== side) moves.push({r:nr,c:nc});
+      };
+      if (p.t === 'p') {
+        const dir = side === 'w' ? -1 : 1;
+        const start = side === 'w' ? 6 : 1;
+        if (!attackOnly && !board[r + dir]?.[c]) add(r+dir, c, false);
+        if (!attackOnly && r === start && !board[r + dir]?.[c] && !board[r + dir*2]?.[c]) moves.push({r:r+dir*2,c});
+        for (const dc of [-1,1]) {
+          const nr = r + dir, nc = c + dc;
+          if (!inside(nr,nc)) continue;
+          const t = board[nr][nc];
+          if (attackOnly) moves.push({r:nr,c:nc});
+          else if (t && t.c !== side) moves.push({r:nr,c:nc, capture:true});
+        }
+      }
+      if (p.t === 'n') {
+        const ds = [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
+        ds.forEach(([dr,dc]) => add(r+dr,c+dc));
+      }
+      if (p.t === 'b' || p.t === 'r' || p.t === 'q') {
+        const dirs = [];
+        if (p.t === 'b' || p.t === 'q') dirs.push([1,1],[1,-1],[-1,1],[-1,-1]);
+        if (p.t === 'r' || p.t === 'q') dirs.push([1,0],[-1,0],[0,1],[0,-1]);
+        for (const [dr,dc] of dirs) {
+          let nr = r + dr, nc = c + dc;
+          while (inside(nr,nc)) {
+            const t = board[nr][nc];
+            if (!t) moves.push({r:nr,c:nc});
+            else { if (t.c !== side) moves.push({r:nr,c:nc}); break; }
+            nr += dr; nc += dc;
+          }
+        }
+      }
+      if (p.t === 'k') {
+        for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) {
+          if (dr || dc) add(r+dr,c+dc);
+        }
+      }
+      return moves;
+    }
+
+    function legalChessMoves(board, r, c) {
+      const p = board[r][c];
+      if (!p) return [];
+      const side = p.c;
+      const pseudo = pseudoChessMoves(board, r, c, false);
+      const legal = [];
+      for (const m of pseudo) {
+        const test = cloneChessBoard(board);
+        test[m.r][m.c] = test[r][c];
+        test[r][c] = null;
+        // Promotion to queen
+        if (test[m.r][m.c].t === 'p' && (m.r === 0 || m.r === 7)) test[m.r][m.c].t = 'q';
+        const king = findKing(test, side);
+        if (!king) continue;
+        const opp = side === 'w' ? 'b' : 'w';
+        if (!isSquareAttacked(test, king[0], king[1], opp)) legal.push(m);
+      }
+      return legal;
+    }
+
+    function updateChessStatus() {
+      const g = state.multi.chess;
+      const side = g.turn;
+      const opp = side === 'w' ? 'b' : 'w';
+      const any = [];
+      for (let r=0;r<8;r++) for (let c=0;c<8;c++) {
+        const p = g.board[r][c];
+        if (p && p.c === side) any.push(...legalChessMoves(g.board, r, c));
+      }
+      const king = findKing(g.board, side);
+      const check = king ? isSquareAttacked(g.board, king[0], king[1], opp) : false;
+      if (!any.length) {
+        g.winner = check ? opp : 'D';
+        g.status = g.winner === 'D' ? 'Stalemate' : `${g.winner === 'w' ? 'White' : 'Black'} wins`;
+      } else {
+        g.status = `${side === 'w' ? 'White' : 'Black'} to move${check ? ' — check' : ''}`;
+      }
+    }
+
+    function chessMove(r,c) {
+      const g = state.multi.chess;
+      if (!g || g.winner) return;
+      if (g.selected) {
+        const [sr,sc] = g.selected;
+        const legal = g.legal;
+        const move = legal.find(m => m.r===r && m.c===c);
+        if (move) {
+          g.board[r][c] = g.board[sr][sc];
+          g.board[sr][sc] = null;
+          if (g.board[r][c].t === 'p' && (r === 0 || r === 7)) g.board[r][c].t = 'q';
+          g.turn = g.turn === 'w' ? 'b' : 'w';
+          g.selected = null;
+          g.legal = [];
+          updateChessStatus();
+          saveAndRender(g.winner ? (g.winner === 'D' ? 'Chess stalemate' : `${g.winner === 'w' ? 'White' : 'Black'} wins`) : 'Chess move made');
+          return;
+        }
+      }
+      const p = g.board[r][c];
+      if (p && p.c === g.turn) {
+        g.selected = [r,c];
+        g.legal = legalChessMoves(g.board, r, c);
+        saveAndRender();
+      }
+    }
+
+    function battleshipShips() { return [3,2,2]; }
+
+    function placeShip(side, r, c) {
+      const g = state.multi.battleship;
+      if (!g || g.winner || g.phase !== 'place') return;
+      if (g.turn !== side) return;
+      const p = g.players[side];
+      const size = g.shipSizes[g.shipIndex];
+      const coords = [];
+      for (let i=0;i<size;i++) {
+        const nr = r + (g.orient === 'V' ? i : 0);
+        const nc = c + (g.orient === 'H' ? i : 0);
+        if (!inside6(nr,nc)) return setStatus('Ship does not fit');
+        if (p.board[nr][nc]) return setStatus('Ships cannot overlap');
+        coords.push([nr,nc]);
+      }
+      coords.forEach(([nr,nc]) => p.board[nr][nc] = 'S');
+      p.ships.push(coords);
+      g.shipIndex++;
+      if (g.shipIndex >= g.shipSizes.length) {
+        p.placed = true;
+        g.shipIndex = 0;
+        if (side === 'r') g.turn = 'b';
+        else { g.phase = 'battle'; g.turn = 'r'; }
+      }
+      saveAndRender('Ship placed');
+    }
+
+    function inside6(r,c) { return r>=0 && c>=0 && r<6 && c<6; }
+
+    function fireShot(r,c) {
+      const g = state.multi.battleship;
+      if (!g || g.phase !== 'battle' || g.winner) return;
+      const shooter = g.turn;
+      const target = shooter === 'r' ? 'b' : 'r';
+      const opp = g.players[target];
+      const shotGrid = g.players[shooter].shots;
+      if (shotGrid[r][c]) return setStatus('Already fired there');
+      if (opp.board[r][c] === 'S') {
+        shotGrid[r][c] = 'H';
+        opp.board[r][c] = 'X';
+        if (opp.board.flat().every(v => v !== 'S')) g.winner = shooter;
+        else setStatus('Hit');
+      } else {
+        shotGrid[r][c] = 'M';
+        setStatus('Miss');
+        g.turn = target;
+      }
+      saveAndRender(g.winner ? `${g.winner.toUpperCase()} wins` : 'Battleship updated');
+    }
+
+    function autoTextCell(event, cb) {
+      const val = event.target.value;
+      cb(val);
+      const next = event.target.parentElement?.nextElementSibling?.querySelector('input');
+      if (next) next.focus();
+    }
+
+    function renderHome() {
+      return `
+        <div class="grid home-grid">
+          <div class="hero">
+            <h2>One platform. Multiple games. Static hosting.</h2>
+            <p>
+              This hub is designed to run directly on GitHub Pages. Solo games work entirely in-browser.
+              Multiplayer rooms are shareable through a link, so you can copy the current game state and send it to a friend without paying for a backend.
+            </p>
+            <div class="toolbar" style="margin-top:16px;">
+              <button class="primary" data-action="resume">Resume last game</button>
+              <button class="ghost" data-action="reset-all">Reset all saved games</button>
+            </div>
+            <div class="hr"></div>
+            <div class="notice">
+              Multiplayer here is serverless. The room state is encoded in the URL, which keeps hosting free and simple.
+              That means the link is the transport mechanism: open it, play, and copy the updated link after a move.
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-hd">
+              <div>
+                <div class="section-title">Game Library</div>
+                <div class="muted small">Select a mode below</div>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="cards">
+                ${gameCard('Solo', 'Sudoku', 'Choose easy, medium, or hard and fill the grid.', 'Start', 'solo-sudoku')}
+                ${gameCard('Solo', 'Wordle', '6 guesses, difficulty-based word pools, keyboard included.', 'Start', 'solo-wordle')}
+                ${gameCard('Solo', 'Mini Crossword', 'A compact crossword-style puzzle board with clues.', 'Start', 'solo-crossword')}
+                ${gameCard('Multiplayer', 'Tic-Tac-Toe', 'Fast linkable room play.', 'Create room', 'multi-ttt')}
+                ${gameCard('Multiplayer', 'Connect Four', 'Drop tokens, share the room link.', 'Create room', 'multi-connect4')}
+                ${gameCard('Multiplayer', 'Checkers', 'Turn-based board play with captures.', 'Create room', 'multi-checkers')}
+                ${gameCard('Multiplayer', 'Chess', 'Basic chess with legal moves and promotion.', 'Create room', 'multi-chess')}
+                ${gameCard('Multiplayer', 'Battleship', 'Place ships, then fire using the shared room state.', 'Create room', 'multi-battleship')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function gameCard(kind, title, desc, button, action) {
+      const badgeClass = kind === 'Solo' ? 'gold' : 'green';
+      return `
+        <div class="card">
+          <div class="badge ${badgeClass}">${kind}</div>
+          <h3>${title}</h3>
+          <p>${desc}</p>
+          <div class="row"><button class="primary" data-action="${action}">${button}</button></div>
+        </div>
+      `;
+    }
+
+    function renderSolo() {
+      const game = state.active;
+      const header = `
+        <div class="game-head">
+          <div>
+            <h2>${gameLabel(game)}</h2>
+            <div class="sub">Free browser game, no server required</div>
+          </div>
+          <div class="toolbar">
+            ${game === 'sudoku' ? difficultySelect('sudoku') : ''}
+            ${game === 'wordle' ? difficultySelect('wordle') : ''}
+            ${game === 'crossword' ? crosswordSelect() : ''}
+            <button class="ghost" data-action="new-${game}">New</button>
+            <button class="ghost" data-action="copy-link" style="display:none;">Copy link</button>
+          </div>
+        </div>
+      `;
+      let body = '';
+      if (game === 'sudoku') body = renderSudoku();
+      if (game === 'wordle') body = renderWordle();
+      if (game === 'crossword') body = renderCrossword();
+      return `
+        <div class="game-shell">
+          <div class="game-main">
+            ${header}
+            <div class="game-body">${body}</div>
+          </div>
+          <div class="game-side">${sidePanel(game)}</div>
+        </div>
+      `;
+    }
+
+    function renderMulti() {
+      const game = state.active;
+      const header = `
+        <div class="game-head">
+          <div>
+            <h2>${gameLabel(game)}</h2>
+            <div class="sub">Create a room and share the link</div>
+          </div>
+          <div class="toolbar">
+            <button class="primary" data-action="copy-link">Copy room link</button>
+            <button class="ghost" data-action="new-${game}">New room</button>
+          </div>
+        </div>
+      `;
+      let body = '';
+      if (game === 'ttt') body = renderTicTacToe();
+      if (game === 'connect4') body = renderConnect4();
+      if (game === 'checkers') body = renderCheckers();
+      if (game === 'chess') body = renderChess();
+      if (game === 'battleship') body = renderBattleship();
+      return `
+        <div class="game-shell">
+          <div class="game-main">
+            ${header}
+            <div class="game-body">${body}</div>
+          </div>
+          <div class="game-side">${sidePanel(game)}</div>
+        </div>
+      `;
+    }
+
+    function gameLabel(game) {
+      return ({ sudoku: 'Sudoku', wordle: 'Wordle', crossword: 'Mini Crossword', ttt: 'Tic-Tac-Toe', connect4: 'Connect Four', checkers: 'Checkers', chess: 'Chess', battleship: 'Battleship' })[game] || 'Game';
+    }
+
+    function difficultySelect(game) {
+      const sel = game === 'sudoku' ? state.solo.sudoku?.difficulty : state.solo.wordle?.difficulty;
+      return `
+        <select class="field" data-action="difficulty-${game}">
+          <option value="easy" ${sel==='easy' ? 'selected' : ''}>Easy</option>
+          <option value="medium" ${sel==='medium' ? 'selected' : ''}>Medium</option>
+          <option value="hard" ${sel==='hard' ? 'selected' : ''}>Hard</option>
+        </select>
+      `;
+    }
+
+    function crosswordSelect() {
+      const idx = state.solo.crossword?.index || 0;
+      return `
+        <select class="field" data-action="crossword-puzzle">
+          ${CROSSWORD_PUZZLES.map((p,i)=>`<option value="${i}" ${i===idx?'selected':''}>${p.name}</option>`).join('')}
+        </select>
+      `;
+    }
+
+    function sidePanel(game) {
+      const room = state.roomLink || window.location.href;
+      const explanation = {
+        sudoku: 'Select a cell, then use the keypad or your keyboard to fill digits. The puzzle is validated against the generated solution.',
+        wordle: 'Type five letters and press Enter. Green means correct place, gold means present elsewhere, gray means absent.',
+        crossword: 'Fill each cell to match the solution. The puzzle is compact so it stays friendly for mobile browsers.',
+        ttt: 'The URL contains the current board. Open the same link to continue the match from any device.',
+        connect4: 'Drop tokens into a column. Four in a row wins.',
+        checkers: 'Click one of your pieces, then click a destination. Captures and chained captures are supported.',
+        chess: 'Click a piece to see legal moves. This version includes standard movement and pawn promotion.',
+        battleship: 'During setup, place ships for the active side. In battle, click the opponent grid to fire.'
+      }[game] || '';
+      return `
+        <div class="stack">
+          <div class="badge">Shareable state</div>
+          <input class="field" value="${escapeHtml(room)}" readonly onclick="this.select()" />
+          <button class="primary" data-action="copy-link">Copy link</button>
+          <button class="ghost" data-action="home">Back to home</button>
+          <div class="hr"></div>
+          <div class="panel" style="background:rgba(255,255,255,.03); box-shadow:none;">
+            <div class="panel-body">
+              <div class="section-title">How it works</div>
+              <div class="muted small">${escapeHtml(explanation)}</div>
+            </div>
+          </div>
+          <div class="panel" style="background:rgba(255,255,255,.03); box-shadow:none;">
+            <div class="panel-body">
+              <div class="section-title">Current status</div>
+              <div class="muted small">${escapeHtml(statusPill.textContent)}</div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSudoku() {
+      const s = state.solo.sudoku;
+      if (!s) return '';
+      return `
+        <div class="board-wrap">
+          <div class="notice">The generated Sudoku uses a full valid solution, then removes cells based on difficulty. Your progress is stored in the page URL.</div>
+          <div class="board" style="grid-template-columns: repeat(9, var(--cell));">
+            ${s.board.flatMap((row, r) => row.map((v, c) => {
+              const sel = s.selected && s.selected[0] === r && s.selected[1] === c;
+              const fixed = s.fixed[r][c];
+              return `<button class="cell input ${sel ? 'selected' : ''} ${fixed ? 'hint' : ''}" data-action="sudoku-cell" data-r="${r}" data-c="${c}">${fixed ? v : `<input maxlength="1" value="${v ?? ''}" data-r="${r}" data-c="${c}" ${fixed ? 'disabled' : ''} />`}</button>`;
+            })).join('')}
+          </div>
+          <div class="kbd">
+            ${[1,2,3,4,5,6,7,8,9].map(n => `<button class="ghost" data-action="sudoku-num" data-n="${n}">${n}</button>`).join('')}
+            <button class="danger" data-action="sudoku-clear">⌫</button>
+          </div>
+          <div class="footer-note">Tip: use the keyboard too. When every cell matches the solution, the puzzle is marked solved.</div>
+        </div>
+      `;
+    }
+
+    function renderWordle() {
+      const w = state.solo.wordle;
+      if (!w) return '';
+      const board = w.rows.map((row, r) => `
+        <div class="guess-row">
+          ${row.map((ch, c) => `<div class="letter ${w.result[r][c] || ''}">${ch || ''}</div>`).join('')}
+        </div>
+      `).join('');
+      return `
+        <div class="board-wrap">
+          <div class="toolbar">
+            <button class="ghost" data-action="wordle-submit">Enter</button>
+            <button class="danger" data-action="wordle-backspace">Delete</button>
+          </div>
+          <div class="wordle-grid">${board}</div>
+          <div class="mini-kbd">
+            ${'QWERTYUIOPASDFGHJKLZXCVBNM'.split('').map(ch => `<button class="ghost" data-action="wordle-letter" data-ch="${ch}">${ch}</button>`).join('')}
+          </div>
+          <div class="footer-note">Difficulty changes the target word pool. A new board is available anytime from the header menu.</div>
+          ${w.won ? '<div class="notice" style="margin-top:14px;">You solved it.</div>' : ''}
+          ${w.lost ? `<div class="notice" style="margin-top:14px;">Out of guesses. Answer: <strong>${w.answer}</strong></div>` : ''}
+        </div>
+      `;
+    }
+
+    function renderCrossword() {
+      const x = state.solo.crossword;
+      if (!x) return '';
+      const grid = x.puzzle.grid;
+      return `
+        <div class="board-wrap">
+          <div class="notice">This is a compact crossword-style board designed to be readable on mobile and desktop.</div>
+          <div class="crossword" style="grid-template-columns: repeat(${grid[0].length}, 42px);">
+            ${grid.flatMap((row, r) => row.map((cell, c) => {
+              if (cell === null) return `<div class="cell block">#</div>`;
+              const val = x.cells[r][c] || '';
+              return `<div class="cell"><input maxlength="1" value="${val}" data-action="crossword-cell" data-r="${r}" data-c="${c}" /></div>`;
+            })).join('')}
+          </div>
+          <div class="clues">
+            <div class="clue-box"><h4>Across</h4><ol>${x.puzzle.clues.across.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ol></div>
+            <div class="clue-box"><h4>Down</h4><ol>${x.puzzle.clues.down.map(c => `<li>${escapeHtml(c)}</li>`).join('')}</ol></div>
+          </div>
+          ${x.solved ? '<div class="notice" style="margin-top:14px;">Puzzle solved.</div>' : ''}
+        </div>
+      `;
+    }
+
+    function renderTicTacToe() {
+      const g = state.multi.ttt;
+      if (!g) return '';
+      return `
+        <div class="board-wrap">
+          <div class="notice">Turn: <strong>${g.winner ? (g.winner === 'D' ? 'Draw' : g.winner + ' wins') : g.turn}</strong></div>
+          <div class="tic-grid">
+            ${g.board.map((v, i) => `<button class="cell" data-action="ttt-move" data-i="${i}">${v}</button>`).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderConnect4() {
+      const g = state.multi.connect4;
+      if (!g) return '';
+      return `
+        <div class="board-wrap">
+          <div class="notice">Turn: <strong>${g.winner ? (g.winner === 'D' ? 'Draw' : g.winner + ' wins') : g.turn}</strong>. Click a column top to drop a token.</div>
+          <div class="connect-grid">
+            ${[0,1,2,3,4,5,6].map(col => `<button class="ghost" style="grid-row:1;" data-action="connect-move" data-col="${col}">▼</button>`).join('')}
+            ${g.board.flatMap(row => row.map(v => `<div class="connect-cell">${v || ''}</div>`)).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCheckers() {
+      const g = state.multi.checkers;
+      if (!g) return '';
+      return `
+        <div class="board-wrap">
+          <div class="notice">Turn: <strong>${g.winner ? g.winner.toUpperCase() + ' wins' : g.turn.toUpperCase()}</strong>. Click your piece, then its destination.</div>
+          <div class="checkers-grid" style="grid-template-columns: repeat(8, 56px);">
+            ${g.board.flatMap((row, r) => row.map((p, c) => {
+              const dark = (r + c) % 2 === 1;
+              const sel = g.selected && g.selected[0] === r && g.selected[1] === c;
+              const forced = g.forced && g.forced[0] === r && g.forced[1] === c;
+              const cls = `${dark ? 'dark' : 'light'} ${sel ? 'selected' : ''} ${forced ? 'target' : ''}`;
+              return `<button class="cell ${cls}" data-action="checkers-cell" data-r="${r}" data-c="${c}">${p ? `<span class="piece ${p === 'r' || p === 'R' ? 'red' : 'black'}">${pieceSymbol(p)}</span>` : ''}</button>`;
+            })).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function pieceSymbol(p) {
+      return { r: '⛂', R: '⛃', b: '⛀', B: '⛁' }[p] || '';
+    }
+
+    function renderChess() {
+      const g = state.multi.chess;
+      if (!g) return '';
+      return `
+        <div class="board-wrap">
+          <div class="notice">${escapeHtml(g.status || '')}</div>
+          <div class="chess-grid" style="grid-template-columns: repeat(8, 56px);">
+            ${g.board.flatMap((row, r) => row.map((p, c) => {
+              const dark = (r + c) % 2 === 1;
+              const sel = g.selected && g.selected[0] === r && g.selected[1] === c;
+              const target = g.legal?.some(m => m.r === r && m.c === c);
+              const cls = `${dark ? 'dark' : 'light'} ${sel ? 'selected' : ''} ${target ? 'target' : ''}`;
+              return `<button class="cell ${cls}" data-action="chess-cell" data-r="${r}" data-c="${c}">${p ? `<span class="piece ${p.c}">${PIECES[p.c][p.t]}</span>` : ''}</button>`;
+            })).join('')}
+          </div>
+          <div class="footer-note">This implementation supports legal movement and promotion. Castling and en passant are omitted to keep the app fully static and lightweight.</div>
+        </div>
+      `;
+    }
+
+    function renderBattleship() {
+      const g = state.multi.battleship;
+      if (!g) return '';
+      const me = g.turn;
+      const opp = me === 'r' ? 'b' : 'r';
+      const my = g.players[me];
+      const enemy = g.players[opp];
+      const phaseText = g.phase === 'place' ? `Place ships for ${me.toUpperCase()}` : `Battle phase — ${me.toUpperCase()} to move`;
+      const grid = g.phase === 'place' ? my.board : enemy.board;
+      const action = g.phase === 'place' ? 'battle-place' : 'battle-fire';
+      return `
+        <div class="board-wrap">
+          <div class="notice">${escapeHtml(phaseText)}${g.phase === 'place' ? ` • Ship size: <strong>${g.shipSizes[g.shipIndex]}</strong> • Orientation: <strong>${g.orient}</strong>` : ''}</div>
+          <div class="toolbar">
+            ${g.phase === 'place' ? `<button class="ghost" data-action="battle-orient">Toggle orientation</button>` : ''}
+          </div>
+          <div class="battle-grid" style="grid-template-columns: repeat(6, 56px);">
+            ${grid.flatMap((row, r) => row.map((v, c) => {
+              const display = g.phase === 'place' ? (my.board[r][c] === 'S' ? '■' : '') : (enemy.shots?.[r]?.[c] || '');
+              return `<button class="cell ${(r+c)%2===1 ? 'dark' : 'light'}" data-action="${action}" data-r="${r}" data-c="${c}">${display}</button>`;
+            })).join('')}
+          </div>
+          <div class="footer-note">Each side places ships on their own turn, then play switches to battle. Because this is static and serverless, the room state is encoded into the URL.</div>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function render() {
+      homeBtn.style.display = state.screen === 'home' ? 'none' : 'inline-flex';
+      let html = '';
+      if (state.screen === 'home') html = renderHome();
+      if (state.screen === 'solo') html = renderSolo();
+      if (state.screen === 'multi') html = renderMulti();
+      app.innerHTML = html;
+    }
+
+    function restoreFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const data = params.get('data');
+      if (!data) return;
+      const restored = urlSafeDecode(data);
+      if (!restored) return;
+      state.screen = restored.screen || 'home';
+      state.active = restored.active || null;
+      state.solo = restored.solo || state.solo;
+      state.multi = restored.multi || state.multi;
+    }
+
+    function resetAll() {
+      state.screen = 'home';
+      state.active = null;
+      state.solo = { sudoku: null, wordle: null, crossword: null };
+      state.multi = { ttt: null, connect4: null, checkers: null, chess: null, battleship: null };
+      setStatus('Ready');
+      updateUrlState();
+      render();
+    }
+
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const action = btn.dataset.action;
+      if (action === 'home') return goHome();
+      if (action === 'resume') {
+        const p = new URLSearchParams(window.location.search).get('data');
+        if (p) restoreFromUrl();
+        return render();
+      }
+      if (action === 'reset-all') return resetAll();
+      if (action === 'copy-link') return copyLink();
+      if (action === 'solo-sudoku') return openSolo('sudoku');
+      if (action === 'solo-wordle') return openSolo('wordle');
+      if (action === 'solo-crossword') return openSolo('crossword');
+      if (action === 'multi-ttt') return openMulti('ttt');
+      if (action === 'multi-connect4') return openMulti('connect4');
+      if (action === 'multi-checkers') return openMulti('checkers');
+      if (action === 'multi-chess') return openMulti('chess');
+      if (action === 'multi-battleship') return openMulti('battleship');
+      if (action.startsWith('new-')) {
+        const game = action.slice(4);
+        if (game === 'sudoku') return initSudoku(state.solo.sudoku?.difficulty || 'medium');
+        if (game === 'wordle') return initWordle(state.solo.wordle?.difficulty || 'medium');
+        if (game === 'crossword') return initCrossword((state.solo.crossword?.index + 1) % CROSSWORD_PUZZLES.length);
+        if (game === 'ttt') return initTicTacToe();
+        if (game === 'connect4') return initConnect4();
+        if (game === 'checkers') return initCheckers();
+        if (game === 'chess') return initChess();
+        if (game === 'battleship') return initBattleship();
+      }
+      if (action === 'sudoku-cell') return selectSudokuCell(Number(btn.dataset.r), Number(btn.dataset.c));
+      if (action === 'sudoku-num') return sudokuInput(btn.dataset.n);
+      if (action === 'sudoku-clear') return sudokuBackspace();
+      if (action === 'wordle-letter') return wordleLetter(btn.dataset.ch);
+      if (action === 'wordle-backspace') return wordleBackspace();
+      if (action === 'wordle-submit') return wordleSubmit();
+      if (action === 'ttt-move') return tttMove(Number(btn.dataset.i));
+      if (action === 'connect-move') return connectMove(Number(btn.dataset.col));
+      if (action === 'checkers-cell') return checkersMove(Number(btn.dataset.r), Number(btn.dataset.c));
+      if (action === 'chess-cell') return chessMove(Number(btn.dataset.r), Number(btn.dataset.c));
+      if (action === 'battle-orient') {
+        const g = state.multi.battleship; g.orient = g.orient === 'H' ? 'V' : 'H'; saveAndRender('Orientation changed');
+      }
+      if (action === 'battle-place') return placeShip(state.multi.battleship.turn, Number(btn.dataset.r), Number(btn.dataset.c));
+      if (action === 'battle-fire') return fireShot(Number(btn.dataset.r), Number(btn.dataset.c));
+      if (action === 'difficulty-sudoku') {
+        initSudoku(btn.value);
+      }
+      if (action === 'difficulty-wordle') {
+        initWordle(btn.value);
+      }
+      if (action === 'crossword-puzzle') {
+        initCrossword(Number(btn.value));
+      }
+    });
+
+    document.addEventListener('change', (e) => {
+      const el = e.target.closest('[data-action]');
+      if (!el) return;
+      const action = el.dataset.action;
+      if (action === 'difficulty-sudoku') initSudoku(el.value);
+      if (action === 'difficulty-wordle') initWordle(el.value);
+      if (action === 'crossword-puzzle') initCrossword(Number(el.value));
+      if (action === 'crossword-cell') crosswordSet(Number(el.dataset.r), Number(el.dataset.c), el.value);
+    });
+
+    document.addEventListener('input', (e) => {
+      const el = e.target;
+      if (el.matches('input[data-action="crossword-cell"]')) {
+        crosswordSet(Number(el.dataset.r), Number(el.dataset.c), el.value);
+      }
+      if (el.matches('input[data-r][data-c]')) {
+        const r = Number(el.dataset.r), c = Number(el.dataset.c);
+        if (state.active === 'sudoku') {
+          const v = el.value.replace(/[^1-9]/g, '').slice(0,1);
+          const s = state.solo.sudoku;
+          if (s && !s.fixed[r][c]) {
+            s.board[r][c] = v ? Number(v) : null;
+            s.complete = sudokuIsSolved(s);
+            saveAndRender(s.complete ? 'Sudoku solved' : 'Sudoku updated');
+          }
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (state.screen === 'solo' && state.active === 'sudoku' && /[1-9]/.test(e.key)) {
+        e.preventDefault();
+        sudokuInput(e.key);
+      }
+      if (state.screen === 'solo' && state.active === 'sudoku' && (e.key === 'Backspace' || e.key === 'Delete')) {
+        e.preventDefault();
+        sudokuBackspace();
+      }
+      if (state.screen === 'solo' && state.active === 'wordle') {
+        if (/^[a-zA-Z]$/.test(e.key)) { e.preventDefault(); wordleLetter(e.key.toUpperCase()); }
+        if (e.key === 'Backspace') { e.preventDefault(); wordleBackspace(); }
+        if (e.key === 'Enter') { e.preventDefault(); wordleSubmit(); }
+      }
+    });
+
+    homeBtn.addEventListener('click', goHome);
+
+    // Boot
+    restoreFromUrl();
+    if (!window.location.search.includes('data=')) {
+      updateUrlState();
+    }
+    render();
+  </script>
+</body>
+</html>
