@@ -269,7 +269,7 @@ const PIECES = {
 const S = {
   screen:'home', game:null, room:null, me:null, token:null,
   solo:{sudoku:null,wordle:null,crossword:null,twenty48:null,minesweeper:null},
-  pending:false, lastSynced:null, pollTimer:null, notesMode:false,
+  pending:false, lastSynced:null, pollTimer:null, notesMode:false, roomError:null,
   // local UI state (never synced)
   localSelect:null, localLegal:[],
   battleOrient:'H', battleAwaitingLock:false, lastConnect4:null
@@ -305,11 +305,12 @@ function showConfetti(){
 /* ════════════════════════════════════════════════════════
    API  (JSONP)
 ════════════════════════════════════════════════════════ */
+function getBackendUrl(){return localStorage.getItem('gh_backend_url')||CONFIG.backendUrl;}
 function api(params){
   return new Promise((resolve,reject)=>{
     const cb='__gh_'+Math.random().toString(36).slice(2);
     const s=document.createElement('script');
-    const url=new URL(CONFIG.backendUrl);
+    const url=new URL(getBackendUrl());
     Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='string'?v:JSON.stringify(v)));
     url.searchParams.set('callback',cb);
     window[cb]=(data)=>{cleanup();resolve(data);};
@@ -353,7 +354,7 @@ async function saveRoomState(){
 /* ════════════════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════════════════ */
-function resetLocalState(){S.localSelect=null;S.localLegal=[];S.battleOrient='H';S.battleAwaitingLock=false;S.lastConnect4=null;}
+function resetLocalState(){S.localSelect=null;S.localLegal=[];S.battleOrient='H';S.battleAwaitingLock=false;S.lastConnect4=null;S.roomError=null;}
 function goHome(){S.screen='home';S.game=null;S.room=null;S.me=null;S.token=null;resetLocalState();stopPolling();updateUrl();render();}
 function openSolo(game){
   S.screen='solo';S.game=game;resetLocalState();
@@ -367,8 +368,8 @@ function openSolo(game){
 function openMulti(game){
   S.screen='room';S.game=game;resetLocalState();
   const roomId=qs('room');
-  if(roomId)joinRoom(roomId).catch(err=>{setStatus(err.message,false);render();});
-  else createRoom(game).catch(err=>{setStatus(err.message,false);render();});
+  if(roomId)joinRoom(roomId).catch(err=>{S.roomError=err.message;setStatus(err.message,false);render();});
+  else createRoom(game).catch(err=>{S.roomError=err.message;setStatus(err.message,false);render();});
   updateUrl();render();
 }
 
@@ -792,7 +793,34 @@ function renderSolo(){
 function renderRoom(){
   const g=S.game;
   const head=`<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Live room: <strong>${S.room?.roomId||'...'}</strong></div></div><div class="toolbar"><button class="btn good" data-action="copy-link">Copy link</button><button class="btn warn" data-action="new-room">New room</button></div></div>`;
-  const body=!S.room?`<div class="soft">Joining room&#8230;</div>`:g==='ttt'?renderTTT():g==='connect4'?renderConnect4():g==='checkers'?renderCheckers():g==='chess'?renderChess():renderBattleship();
+  let body;
+  if(!S.room){
+    if(S.roomError){
+      const savedUrl=localStorage.getItem('gh_backend_url')||CONFIG.backendUrl;
+      body=`<div class="scene" style="text-align:center;gap:18px">
+        <div class="notice wide" style="border-color:rgba(255,123,147,.35);background:rgba(255,123,147,.09);color:#ff7b93">
+          &#10060; ${esc(S.roomError)}
+        </div>
+        <div class="soft" style="text-align:left">
+          <strong>Most likely fix:</strong> your Apps Script URL has changed since this file was built.
+          Paste your current deployment URL below, save it, then retry.
+        </div>
+        <div style="display:flex;gap:8px;width:min(560px,100%);flex-wrap:wrap">
+          <input id="urlFixInput" class="room-link" style="flex:1;min-width:0" value="${esc(savedUrl)}" placeholder="https://script.google.com/macros/s/.../exec" />
+          <button class="btn good" data-action="save-backend-url-fix">&#128190; Save URL</button>
+        </div>
+        <div class="toolbar" style="justify-content:center">
+          <button class="btn primary" data-action="retry-room">&#8635; Retry</button>
+          <button class="btn" data-action="test-backend-room">&#128268; Test connection</button>
+          <button class="btn warn" data-action="home">&#8592; Home</button>
+        </div>
+      </div>`;
+    } else {
+      body=`<div class="soft" style="text-align:center">Connecting&#8230;</div>`;
+    }
+  } else {
+    body=g==='ttt'?renderTTT():g==='connect4'?renderConnect4():g==='checkers'?renderCheckers():g==='chess'?renderChess():renderBattleship();
+  }
   const overlay=S.room?.state?.gameOver?renderEndcard():'';
   return `<div class="shell"><div class="stage"><div class="layout"><div class="main" style="position:relative">${overlay}${head}<div class="body scene-wrap"><div class="scene">${syncBar()}${body}</div></div></div>${sidePanel()}</div></div></div>`;
 }
@@ -800,6 +828,9 @@ function render(){
   homeBtn.style.display=S.screen==='home'?'none':'inline-flex';
   app.innerHTML=S.screen==='home'?renderHome():S.screen==='solo'?renderSolo():renderRoom();
   renderSync();
+  // populate backend URL input after DOM is updated
+  const uIn=document.getElementById('backendUrlInput');
+  if(uIn){uIn.value=localStorage.getItem('gh_backend_url')||CONFIG.backendUrl;}
 }
 
 /* ════════════════════════════════════════════════════════
@@ -808,6 +839,25 @@ function render(){
 function handleAction(action,el){
   if(action==='home')return goHome();
   if(action==='reset-local'){S.solo={sudoku:null,wordle:null,crossword:null,twenty48:null,minesweeper:null};setStatus('Progress reset',false);render();return;}
+  if(action==='save-backend-url'||action==='save-backend-url-fix'){
+    const inp=document.getElementById(action==='save-backend-url'?'backendUrlInput':'urlFixInput');
+    const val=(inp?.value||'').trim();
+    if(val&&val.startsWith('https://')){localStorage.setItem('gh_backend_url',val);setStatus('Backend URL saved',false);const el=document.getElementById('backendStatus');if(el)el.textContent='Saved: '+val.slice(0,60)+'...';}
+    else setStatus('Enter a valid https:// URL',false);return;
+  }
+  if(action==='test-backend'||action==='test-backend-room'){
+    setStatus('Testing connection…',true);
+    api({action:'ping'}).then(res=>{
+      const msg=res.ok?'\u2714 Connected! Server responded.':'Backend error: '+(res.error||'unknown');
+      setStatus(msg,false);
+      const el=document.getElementById('backendStatus');if(el)el.textContent=msg;
+    }).catch(err=>{
+      const msg='\u2718 '+err.message+' \u2014 check your URL above.';
+      setStatus(msg,false);
+      const el=document.getElementById('backendStatus');if(el)el.textContent=msg;
+    });return;
+  }
+  if(action==='retry-room'){S.roomError=null;openMulti(S.game);return;}
   if(action==='copy-link')return navigator.clipboard.writeText(shareUrl()).then(()=>setStatus('Link copied!',false)).catch(()=>setStatus('Copy failed',false));
   if(action==='do-refresh')return refreshRoom().catch(e=>setStatus(e.message,false));
   if(action==='resume-room'){const rid=qs('room'),gm=qs('game');if(rid&&gm){S.screen='room';S.game=gm;render();joinRoom(rid).catch(e=>setStatus(e.message,false));}return;}
