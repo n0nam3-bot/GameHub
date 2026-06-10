@@ -1,166 +1,210 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GameHub</title>
   <style>
-    :root{
-      --bg0:#07101f; --bg1:#0b1328; --card:rgba(255,255,255,.06); --card2:rgba(255,255,255,.04);
-      --line:rgba(255,255,255,.12); --line2:rgba(255,255,255,.2); --txt:#eef3ff; --muted:#aab7e8;
-      --accent:#7d9bff; --accent2:#77e2b7; --warn:#ffd166; --danger:#ff7b93; --shadow:0 24px 70px rgba(0,0,0,.35);
-      --shadow2:0 12px 28px rgba(0,0,0,.22); --r:24px; --cell:44px; color-scheme: dark;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; color:var(--txt); font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background:
-        radial-gradient(circle at 10% 8%, rgba(125,155,255,.22), transparent 26%),
-        radial-gradient(circle at 90% 0%, rgba(119,226,183,.14), transparent 22%),
-        radial-gradient(circle at 50% 110%, rgba(255,209,102,.08), transparent 22%),
-        linear-gradient(180deg, var(--bg0), var(--bg1) 48%, var(--bg0));
-      overflow-x:hidden;
-    }
-    body::before{
-      content:""; position:fixed; inset:-30%;
-      background:
-        linear-gradient(115deg, transparent 0 48%, rgba(255,255,255,.02) 50%, transparent 52%),
-        linear-gradient(25deg, transparent 0 45%, rgba(255,255,255,.02) 50%, transparent 55%);
-      transform:rotate(-8deg); animation: drift 20s linear infinite; pointer-events:none; opacity:.45;
-    }
-    @keyframes drift { from{transform:translateX(-4%) rotate(-8deg)} to{transform:translateX(4%) rotate(-8deg)} }
-    @keyframes spin { to{transform:rotate(360deg)} }
-    .app{position:relative; z-index:1; max-width:1460px; margin:0 auto; padding:18px}
-    .top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px}
-    .brand{display:flex; align-items:center; gap:14px}
-    .mark{width:52px; height:52px; border-radius:16px; display:grid; place-items:center; font-weight:900; color:#06111b; background:linear-gradient(135deg, var(--accent), var(--accent2)); box-shadow:var(--shadow2)}
-    .brand h1{margin:0; font-size:1.2rem}
-    .brand p{margin:3px 0 0; color:var(--muted); font-size:.92rem}
-    .top-actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .pill,.btn,.field,.select,.badge{border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.06); color:var(--txt)}
-    .pill{padding:10px 14px; background:rgba(255,255,255,.04); color:#dfe7ff}
-    .btn,.select{padding:11px 14px; cursor:pointer; transition:transform .15s ease,border-color .15s ease,background .15s ease}
-    .btn:hover,.select:hover{transform:translateY(-1px); border-color:var(--line2)}
-    .btn.primary{background:linear-gradient(135deg, rgba(125,155,255,.96), rgba(117,135,255,.9)); border-color:rgba(125,155,255,.45); font-weight:700}
-    .btn.good{background:linear-gradient(135deg, rgba(119,226,183,.16), rgba(119,226,183,.07)); border-color:rgba(119,226,183,.25)}
-    .btn.warn{background:linear-gradient(135deg, rgba(255,209,102,.12), rgba(255,209,102,.06)); border-color:rgba(255,209,102,.22)}
-    .btn.danger{background:linear-gradient(135deg, rgba(255,123,147,.12), rgba(255,123,147,.06)); border-color:rgba(255,123,147,.22)}
-    .shell{display:grid; place-items:center; min-height:calc(100vh - 96px)}
-    .stage{width:min(1320px,100%); display:grid; gap:18px}
-    .hero,.panel,.main,.side{border:1px solid var(--line); border-radius:var(--r); overflow:hidden; background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.03)); box-shadow:var(--shadow2)}
-    .hero{box-shadow:var(--shadow); background:radial-gradient(circle at 8% 10%, rgba(125,155,255,.16), transparent 20%), radial-gradient(circle at 80% 0%, rgba(119,226,183,.16), transparent 22%), linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03))}
-    .hero-inner{padding:24px}
-    .hero h2{margin:0 0 10px; font-size:clamp(1.8rem,3vw,3.35rem); line-height:1.03}
-    .hero p{margin:0; color:var(--muted); max-width:75ch; line-height:1.55}
-    .kicker{display:inline-flex; gap:8px; align-items:center; padding:8px 11px; border-radius:999px; margin-bottom:12px; background:rgba(125,155,255,.12); border:1px solid rgba(125,155,255,.25); color:#dfe7ff; font-size:.84rem}
-    .layout{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:18px; width:100%}
-    .panel-h,.head{padding:16px 16px 0; display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap}
+    :root{--bg0:#07101f;--bg1:#0b1328;--card:rgba(255,255,255,.06);--line:rgba(255,255,255,.12);--line2:rgba(255,255,255,.22);--txt:#eef3ff;--muted:#aab7e8;--accent:#7d9bff;--accent2:#77e2b7;--warn:#ffd166;--danger:#ff7b93;--shadow:0 24px 70px rgba(0,0,0,.38);--shadow2:0 12px 28px rgba(0,0,0,.22);--r:24px;color-scheme:dark}
+    *{box-sizing:border-box}html,body{height:100%;margin:0}
+    body{color:var(--txt);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 10% 8%,rgba(125,155,255,.22),transparent 26%),radial-gradient(circle at 90% 0%,rgba(119,226,183,.14),transparent 22%),linear-gradient(180deg,var(--bg0),var(--bg1) 48%,var(--bg0));overflow-x:hidden}
+    body::before{content:"";position:fixed;inset:-30%;background:linear-gradient(115deg,transparent 0 48%,rgba(255,255,255,.02) 50%,transparent 52%),linear-gradient(25deg,transparent 0 45%,rgba(255,255,255,.02) 50%,transparent 55%);transform:rotate(-8deg);animation:drift 20s linear infinite;pointer-events:none;opacity:.4}
+
+    /* ─ Animations ─ */
+    @keyframes drift{from{transform:translateX(-4%) rotate(-8deg)}to{transform:translateX(4%) rotate(-8deg)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pop{from{transform:scale(.5);opacity:.2}to{transform:scale(1);opacity:1}}
+    @keyframes popIn{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    @keyframes tileShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+    @keyframes chipDrop{from{transform:translateY(-150px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes pieceLand{from{transform:scale(1.28)}to{transform:scale(1)}}
+    @keyframes tileNew{from{transform:scale(.1);opacity:0}to{transform:scale(1);opacity:1}}
+    @keyframes tilePop{0%,100%{transform:scale(1)}45%{transform:scale(1.2)}}
+    @keyframes mineExplode{0%,100%{transform:scale(1)}35%{transform:scale(1.4)}}
+    @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(120vh) rotate(720deg);opacity:0}}
+    @keyframes winPulse{0%,100%{box-shadow:var(--shadow2)}50%{box-shadow:0 0 40px rgba(119,226,183,.45)}}
+    .guess-row.shake{animation:tileShake .35s ease}
+    .chip.drop{animation:chipDrop .28s cubic-bezier(.2,1.4,.6,1)}
+    .tile-new{animation:tileNew .14s ease-out}
+    .mine-cell.mine-hit{animation:mineExplode .32s ease}
+    .confetti-piece{position:fixed;width:9px;height:9px;border-radius:2px;pointer-events:none;z-index:9999}
+    .win-glow{animation:winPulse 1.6s ease infinite}
+    .cell.just-moved .piece{animation:pieceLand .18s ease}
+
+    /* ─ Layout ─ */
+    .app{position:relative;z-index:1;max-width:1460px;margin:0 auto;padding:18px}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .mark{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;font-weight:900;color:#06111b;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow2)}
+    .brand h1{margin:0;font-size:1.2rem}.brand p{margin:3px 0 0;color:var(--muted);font-size:.92rem}
+    .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .pill,.btn,.field,.select,.badge{border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt)}
+    .pill{padding:10px 14px;background:rgba(255,255,255,.04);color:#dfe7ff}
+    .btn,.select{padding:11px 14px;cursor:pointer;font-size:.93rem;transition:transform .15s,border-color .15s,background .15s}
+    .btn:hover,.select:hover{transform:translateY(-1px);border-color:var(--line2)}
+    .btn:active{transform:scale(.96)}
+    .btn.primary{background:linear-gradient(135deg,rgba(125,155,255,.95),rgba(117,135,255,.88));border-color:rgba(125,155,255,.45);font-weight:700}
+    .btn.good{background:linear-gradient(135deg,rgba(119,226,183,.16),rgba(119,226,183,.07));border-color:rgba(119,226,183,.25)}
+    .btn.warn{background:linear-gradient(135deg,rgba(255,209,102,.12),rgba(255,209,102,.06));border-color:rgba(255,209,102,.22)}
+    .btn.danger{background:linear-gradient(135deg,rgba(255,123,147,.12),rgba(255,123,147,.06));border-color:rgba(255,123,147,.22)}
+    .shell{display:grid;place-items:center;min-height:calc(100vh - 96px)}
+    .stage{width:min(1320px,100%);display:grid;gap:18px}
+    .hero,.panel,.main,.side{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.03));box-shadow:var(--shadow2)}
+    .hero{box-shadow:var(--shadow);background:radial-gradient(circle at 8% 10%,rgba(125,155,255,.16),transparent 22%),radial-gradient(circle at 80% 0%,rgba(119,226,183,.16),transparent 22%),linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}
+    .hero-inner{padding:24px}.hero h2{margin:0 0 10px;font-size:clamp(1.8rem,3vw,3.35rem);line-height:1.04}
+    .hero p{margin:0;color:var(--muted);max-width:75ch;line-height:1.55}
+    .kicker{display:inline-flex;gap:8px;align-items:center;padding:8px 11px;border-radius:999px;margin-bottom:12px;background:rgba(125,155,255,.12);border:1px solid rgba(125,155,255,.25);color:#dfe7ff;font-size:.84rem}
+    .layout{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;width:100%}
+    .panel-h,.head{padding:16px 18px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
     .panel-b,.body{padding:16px}
-    .section-title{margin:0 0 12px; font-size:.95rem; letter-spacing:.12em; text-transform:uppercase; color:#d9e1ff}
-    .cards{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px}
-    .card{padding:16px; min-height:158px; border-radius:22px; border:1px solid var(--line); background:rgba(255,255,255,.04); display:flex; flex-direction:column; gap:10px; transition:transform .16s ease,border-color .16s ease}
-    .card:hover{transform:translateY(-2px); border-color:rgba(125,155,255,.28)}
-    .card h3{margin:10px 0 8px; font-size:1.06rem}
-    .card p{margin:0; color:var(--muted); line-height:1.5; font-size:.95rem}
-    .card .row{margin-top:auto; display:flex; gap:8px; flex-wrap:wrap}
-    .badge{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; font-size:.8rem}
-    .badge.solo{background:rgba(255,209,102,.12); border-color:rgba(255,209,102,.24)}
-    .badge.multi{background:rgba(119,226,183,.12); border-color:rgba(119,226,183,.24)}
-    .main{width:100%; min-height:720px}
-    .head{padding:16px 18px; border-bottom:1px solid var(--line); background:linear-gradient(180deg, rgba(255,255,255,.04), transparent)}
-    .head h2{margin:0; font-size:1.22rem}
-    .head .sub{margin-top:4px; color:var(--muted); font-size:.92rem}
-    .toolbar,.stack{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .stack{flex-direction:column; align-items:stretch}
-    .notice{padding:12px 14px; border-radius:16px; border:1px solid rgba(255,209,102,.24); background:rgba(255,209,102,.08); color:#ffe8b0; line-height:1.45}
-    .soft{padding:12px 14px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.04); color:var(--muted); line-height:1.5}
-    .scene-wrap{display:grid; place-items:center; width:100%}
-    .scene{width:min(980px,100%); display:grid; justify-items:center; gap:14px}
-    .syncbar{width:min(980px,100%); display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; padding:10px 14px; border-radius:16px; border:1px solid var(--line); background:rgba(255,255,255,.04)}
-    .sync-left{display:flex; align-items:center; gap:10px; color:var(--muted)}
-    .spinner{width:16px; height:16px; border-radius:999px; border:2px solid rgba(255,255,255,.2); border-top-color:var(--accent); animation:spin .8s linear infinite}
-    .boardbox{width:fit-content; max-width:100%; overflow:auto; padding:2px}
-    .board{display:grid; gap:0; user-select:none}
-    .cell{width:var(--cell); height:var(--cell); border:1px solid rgba(255,255,255,.1); display:grid; place-items:center; background:rgba(255,255,255,.03); color:var(--txt); font-weight:700; padding:0}
+    .section-title{margin:0 0 12px;font-size:.95rem;letter-spacing:.12em;text-transform:uppercase;color:#d9e1ff}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+    .card{padding:16px;min-height:140px;border-radius:22px;border:1px solid var(--line);background:rgba(255,255,255,.04);display:flex;flex-direction:column;gap:8px;transition:transform .16s,border-color .16s}
+    .card:hover{transform:translateY(-2px);border-color:rgba(125,155,255,.28)}
+    .card h3{margin:8px 0 6px;font-size:1.04rem}.card p{margin:0;color:var(--muted);line-height:1.5;font-size:.93rem}
+    .card .row{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+    .badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;font-size:.8rem}
+    .badge.solo{background:rgba(255,209,102,.12);border-color:rgba(255,209,102,.24)}
+    .badge.multi{background:rgba(119,226,183,.12);border-color:rgba(119,226,183,.24)}
+    .main{width:100%;min-height:720px}.head h2{margin:0;font-size:1.22rem}.head .sub{margin-top:4px;color:var(--muted);font-size:.92rem}
+    .toolbar,.stack{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .stack{flex-direction:column;align-items:stretch}
+    .notice{padding:12px 14px;border-radius:16px;border:1px solid rgba(255,209,102,.24);background:rgba(255,209,102,.08);color:#ffe8b0;line-height:1.45}
+    .notice.wide{width:min(980px,100%)}
+    .soft{padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--muted);line-height:1.5}
+    .scene-wrap{display:grid;place-items:center;width:100%}
+    .scene{width:min(980px,100%);display:grid;justify-items:center;gap:14px}
+    .syncbar{width:min(980px,100%);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+    .sync-left{display:flex;align-items:center;gap:10px;color:var(--muted)}
+    .spinner{width:16px;height:16px;border-radius:999px;border:2px solid rgba(255,255,255,.2);border-top-color:var(--accent);animation:spin .8s linear infinite}
+    .boardbox{width:fit-content;max-width:100%;overflow:auto;padding:2px}
+    .cell{width:44px;height:44px;border:1px solid rgba(255,255,255,.1);display:grid;place-items:center;background:rgba(255,255,255,.03);color:var(--txt);font-weight:700;padding:0;cursor:pointer}
     .cell:hover{border-color:rgba(125,155,255,.3)}
-    .cell.dark{background:rgba(255,255,255,.08)}
+    .cell.dark{background:rgba(255,255,255,.09)}
     .cell.light{background:rgba(255,255,255,.03)}
-    .cell.selected{outline:2px solid rgba(125,155,255,.95); outline-offset:-2px}
-    .cell.target{background:rgba(119,226,183,.14)}
-    .cell.hint{background:rgba(255,209,102,.12)}
-    .cell.block{background:rgba(255,255,255,.08); color:transparent}
-    .cell.input{font-size:1rem}
-    .cell.input input{width:100%; height:100%; border:0; background:transparent; color:var(--txt); text-align:center; font-size:1rem; font-weight:800; text-transform:uppercase}
-    .cell.input input:focus{outline:none}
-    .sudoku-grid{grid-template-columns:repeat(9, var(--cell)); border:2px solid rgba(255,255,255,.24); background:rgba(255,255,255,.03)}
-    .sudoku-grid .cell{border-color:rgba(255,255,255,.12)}
-    .sudoku-grid .cell:nth-child(3n){border-right:2px solid rgba(255,255,255,.28)}
-    .sudoku-grid .cell:nth-child(n+19):nth-child(-n+27), .sudoku-grid .cell:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid rgba(255,255,255,.28)}
+    .cell.selected{outline:2px solid rgba(125,155,255,.95);outline-offset:-2px;z-index:1}
+    .cell.target{background:rgba(119,226,183,.18)!important;cursor:pointer}
+    .cell.target:hover{background:rgba(119,226,183,.3)!important}
+    .cell.hint{background:rgba(255,209,102,.12);cursor:default}
+    .cell.block{background:rgba(255,255,255,.08);cursor:default}
+
+    /* ─ Sudoku ─ */
+    .sudoku-grid{display:grid;grid-template-columns:repeat(9,44px);border:2px solid rgba(255,255,255,.24);background:rgba(255,255,255,.03)}
+    .sudoku-grid .cell{border-color:rgba(255,255,255,.1)}
+    .sudoku-grid .cell:nth-child(3n):not(:nth-child(9n)){border-right:2px solid rgba(255,255,255,.28)}
+    .sudoku-grid .cell:nth-child(n+19):nth-child(-n+27),.sudoku-grid .cell:nth-child(n+46):nth-child(-n+54){border-bottom:2px solid rgba(255,255,255,.28)}
     .sudoku-grid .cell:nth-child(9n+1){border-left:2px solid rgba(255,255,255,.28)}
     .sudoku-grid .cell:nth-child(-n+9){border-top:2px solid rgba(255,255,255,.28)}
-    .notes{display:flex; gap:8px; flex-wrap:wrap; align-items:center; justify-content:center; width:min(980px,100%)}
-    .tiny-note{font-size:10px; line-height:1; color:#dfe7ff; opacity:.75}
-    .notes-mode{border-color:rgba(119,226,183,.35); background:rgba(119,226,183,.11)}
-    .word-grid{display:grid; gap:8px}
-    .guess-row{display:grid; grid-template-columns:repeat(5, 52px); gap:8px}
-    .letter{width:52px; height:52px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.04); display:grid; place-items:center; font-size:1.15rem; font-weight:900}
-    .letter.green{background:rgba(119,226,183,.18); border-color:rgba(119,226,183,.4)}
-    .letter.gold{background:rgba(255,209,102,.16); border-color:rgba(255,209,102,.4)}
-    .letter.gray{background:rgba(255,255,255,.08); color:#d2d8ee}
-    .kbd{display:grid; grid-template-columns:repeat(10, minmax(0,1fr)); gap:6px; width:min(980px,100%)}
-    .kbd button{min-height:38px; padding:0}
-    .kbd button.used.absent{opacity:.45}
-    .kbd button.used.present{border-color:rgba(255,209,102,.45); background:rgba(255,209,102,.12)}
-    .kbd button.used.correct{border-color:rgba(119,226,183,.45); background:rgba(119,226,183,.12)}
-    .crossword{display:grid; gap:6px; width:fit-content; margin-bottom:14px}
-    .crossword .cell{width:42px; height:42px; border-radius:10px; overflow:hidden}
-    .crossword .cell input{width:100%; height:100%; border:0; background:transparent; color:var(--txt); text-transform:uppercase; text-align:center; font-weight:900; font-size:1rem}
-    .clues{display:grid; grid-template-columns:1fr 1fr; gap:12px; width:min(980px,100%)}
-    .clue{border:1px solid var(--line); border-radius:16px; padding:12px; background:rgba(255,255,255,.04)}
-    .clue h4{margin:0 0 8px}
-    .clue ol{margin:0; padding-left:20px; color:var(--muted); line-height:1.5}
-    .tic{display:grid; grid-template-columns:repeat(3, 94px); gap:10px}
-    .tic .cell{width:94px; height:94px; border-radius:18px; font-size:2rem; font-weight:900}
-    .connectbox{display:flex; flex-direction:column; gap:10px; align-items:center; width:100%}
-    .connect{display:grid; grid-template-columns:repeat(7, 62px); gap:8px; background:rgba(15,22,44,.7); border:1px solid var(--line); padding:10px; border-radius:18px; width:fit-content; max-width:100%}
-    .connect .slot{width:62px; height:62px; border-radius:999px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.05); display:grid; place-items:center; overflow:hidden}
-    .chip{width:46px; height:46px; border-radius:999px; box-shadow:inset 0 2px 5px rgba(255,255,255,.18), inset 0 -8px 14px rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.2); animation:pop .16s ease}
-    @keyframes pop{from{transform:scale(.55); opacity:.2}to{transform:scale(1); opacity:1}}
-    .chip.red{background:radial-gradient(circle at 30% 30%, #ff8ea2, #ff365f 65%, #bf1439)}
-    .chip.yellow{background:radial-gradient(circle at 30% 30%, #fff3aa, #ffd23b 65%, #bc8e00)}
-    .checkers,.chess,.battle{display:grid; width:fit-content; border:1px solid var(--line); border-radius:18px; overflow:hidden}
-    .checkers .cell,.chess .cell,.battle .cell{width:56px; height:56px; border-radius:0}
-    .piece{display:grid; place-items:center; width:100%; height:100%; font-size:1.75rem; line-height:1}
-    .piece.red{color:#ff7b93}
-    .piece.black{color:#e8eeff}
-    .piece.w{color:#eef2ff}
-    .piece.b{color:#ff7b93}
-    .side{padding:16px; display:flex; flex-direction:column; gap:10px}
-    .cardish{border:1px solid var(--line); border-radius:18px; padding:12px; background:rgba(255,255,255,.04)}
-    .room-link{width:100%; padding:11px 12px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,.05); color:var(--txt)}
-    .room-status{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-    .seat{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(125,155,255,.12); border:1px solid rgba(125,155,255,.25)}
-    .seat.good{background:rgba(119,226,183,.12); border-color:rgba(119,226,183,.25)}
-    .seat.warn{background:rgba(255,209,102,.12); border-color:rgba(255,209,102,.25)}
-    .overlay{position:absolute; inset:0; display:grid; place-items:center; background:linear-gradient(180deg, rgba(7,16,31,.36), rgba(7,16,31,.78)); backdrop-filter:blur(4px); z-index:5; border-radius:24px}
-    .overlay .box{min-width:min(92%, 420px); max-width:92%; border-radius:22px; background:rgba(15,22,44,.94); border:1px solid rgba(255,255,255,.12); padding:18px; box-shadow:var(--shadow); animation:popIn .22s ease}
-    @keyframes popIn{from{opacity:0; transform:translateY(8px) scale(.98)}to{opacity:1; transform:translateY(0) scale(1)}}
-    .result-badges{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
-    .result-badge{display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; border:1px solid var(--line); background:rgba(255,255,255,.05)}
-    .result-badge.win{background:rgba(119,226,183,.12); border-color:rgba(119,226,183,.25)}
-    .result-badge.loss{background:rgba(255,123,147,.12); border-color:rgba(255,123,147,.25)}
-    .result-badge.draw{background:rgba(255,209,102,.12); border-color:rgba(255,209,102,.25)}
-    .footer-note{color:var(--muted); font-size:.9rem; line-height:1.5}
-    @media (max-width:1100px){ .layout{grid-template-columns:1fr} .main{min-height:auto} .scene{width:100%} }
-    @media (max-width:720px){
-      :root{--cell:36px}
-      .cards,.clues{grid-template-columns:1fr}
-      .guess-row{grid-template-columns:repeat(5, 48px)} .letter{width:48px; height:48px}
-      .tic{grid-template-columns:repeat(3, 78px)} .tic .cell{width:78px; height:78px}
-      .connect{grid-template-columns:repeat(7, 48px)} .connect .slot{width:48px; height:48px} .chip{width:34px; height:34px}
-      .checkers .cell,.chess .cell,.battle .cell{width:42px; height:42px}
-      .kbd{grid-template-columns:repeat(5, minmax(0,1fr))}
+    .notes-mode{border-color:rgba(119,226,183,.35)!important;background:rgba(119,226,183,.11)!important}
+    .tiny-note{font-size:8px;line-height:1.1;color:#dfe7ff;opacity:.7;display:grid;grid-template-columns:repeat(3,1fr);width:36px}
+    .tiny-note span{text-align:center}
+
+    /* ─ Wordle ─ */
+    .word-grid{display:grid;gap:8px}
+    .guess-row{display:grid;grid-template-columns:repeat(5,52px);gap:8px}
+    .letter{width:52px;height:52px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);display:grid;place-items:center;font-size:1.15rem;font-weight:900;transition:background .2s,border-color .2s,color .2s}
+    .letter.filled{border-color:rgba(255,255,255,.3)}
+    .letter.green{background:rgba(119,226,183,.22);border-color:rgba(119,226,183,.5);color:#77e2b7}
+    .letter.gold{background:rgba(255,209,102,.2);border-color:rgba(255,209,102,.5);color:#ffd166}
+    .letter.gray{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14);color:#aab7e8}
+    .kbd{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:5px;width:min(560px,100%)}
+    .kbd .btn{min-height:42px;padding:0;font-size:.85rem;font-weight:700}
+    .kbd .btn.used.absent{opacity:.35}
+    .kbd .btn.used.present{border-color:rgba(255,209,102,.5);background:rgba(255,209,102,.16)}
+    .kbd .btn.used.correct{border-color:rgba(119,226,183,.5);background:rgba(119,226,183,.16)}
+
+    /* ─ Crossword ─ */
+    .crossword{display:grid;gap:4px;width:fit-content}
+    .crossword .cell{width:40px;height:40px;border-radius:8px;overflow:hidden}
+    .crossword .cell input{width:100%;height:100%;border:0;background:transparent;color:var(--txt);text-transform:uppercase;text-align:center;font-weight:900;font-size:1rem;cursor:pointer}
+    .clues{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:min(980px,100%)}
+    .clue{border:1px solid var(--line);border-radius:16px;padding:12px;background:rgba(255,255,255,.04)}
+    .clue h4{margin:0 0 8px}.clue ol{margin:0;padding-left:20px;color:var(--muted);line-height:1.5}
+
+    /* ─ Tic-Tac-Toe ─ */
+    .tic{display:grid;grid-template-columns:repeat(3,88px);gap:10px}
+    .tic .cell{width:88px;height:88px;border-radius:18px;font-size:2.1rem;font-weight:900}
+
+    /* ─ Connect Four ─ */
+    .connectbox{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+    .connect{display:grid;grid-template-columns:repeat(7,60px);gap:8px;background:rgba(12,20,44,.75);border:1px solid var(--line);padding:10px;border-radius:18px;width:fit-content}
+    .connect .slot{width:60px;height:60px;border-radius:999px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.04);display:grid;place-items:center;overflow:hidden}
+    .chip{width:44px;height:44px;border-radius:999px;box-shadow:inset 0 2px 5px rgba(255,255,255,.18),inset 0 -8px 14px rgba(0,0,0,.35);animation:pop .15s ease}
+    .chip.red{background:radial-gradient(circle at 32% 32%,#ff8ea2,#ff365f 65%,#bf1439)}
+    .chip.yellow{background:radial-gradient(circle at 32% 32%,#fff3aa,#ffd23b 65%,#bc8e00)}
+
+    /* ─ Chess & Checkers ─ */
+    .checkers,.chess,.battle{display:grid;width:fit-content;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+    .checkers .cell,.chess .cell,.battle .cell{width:56px;height:56px;border-radius:0;border-color:transparent}
+    .piece{display:grid;place-items:center;width:100%;height:100%;font-size:1.75rem;line-height:1;pointer-events:none}
+    .piece.red{color:#ff7b93}.piece.black{color:#e8eeff}
+    .piece.w{color:#f0f4ff;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+    .piece.b{color:#ff7b93;text-shadow:0 1px 4px rgba(0,0,0,.5)}
+
+    /* ─ Battleship ─ */
+    .cell.has-ship{background:rgba(125,155,255,.2)!important;border-color:rgba(125,155,255,.4)!important}
+    .cell.ship-preview{background:rgba(119,226,183,.2)!important;border-color:rgba(119,226,183,.5)!important}
+    .cell.ship-preview-invalid{background:rgba(255,123,147,.18)!important;border-color:rgba(255,123,147,.45)!important}
+    .cell.hit-marker{background:rgba(255,123,147,.22)!important}
+    .cell.miss-marker{background:rgba(255,255,255,.05)!important}
+
+    /* ─ 2048 ─ */
+    .grid-2048{display:grid;grid-template-columns:repeat(4,78px);gap:10px;background:rgba(255,255,255,.07);border-radius:18px;padding:12px;width:fit-content;border:1px solid var(--line)}
+    .tile-2048{width:78px;height:78px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:1.4rem;user-select:none}
+    .t0{background:rgba(255,255,255,.04)}.t2{background:#aab7e8;color:#07101f}.t4{background:#93a6e0;color:#07101f}
+    .t8{background:#7d9bff;color:#fff}.t16{background:#6b88ff;color:#fff}.t32{background:#ff9b72;color:#fff}
+    .t64{background:#ff6b4a;color:#fff}.t128{background:#ffd166;color:#07101f;font-size:1.1rem}
+    .t256{background:#ffc040;color:#07101f;font-size:1.1rem}.t512{background:#77e2b7;color:#07101f}
+    .t1024{background:#4dd9a8;color:#07101f;font-size:1rem}.t2048{background:linear-gradient(135deg,#ffd166,#ff7b93);color:#fff;font-size:.88rem;box-shadow:0 0 22px rgba(255,123,147,.4)}
+    .t4096{background:linear-gradient(135deg,#ff7b93,#c77dff);color:#fff;font-size:.8rem}
+    .score-2048{display:flex;gap:14px;justify-content:center}
+    .score-box{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:8px 18px;text-align:center}
+    .score-box .lbl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+    .score-box .val{font-size:1.25rem;font-weight:900;margin-top:2px}
+
+    /* ─ Minesweeper ─ */
+    .mine-grid{display:grid;width:fit-content;margin:0 auto}
+    .mine-cell{border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);display:grid;place-items:center;font-weight:900;cursor:pointer;transition:background .1s;user-select:none}
+    .mine-cell:hover:not(.revealed){background:rgba(255,255,255,.14)}
+    .mine-cell:active:not(.revealed){transform:scale(.9)}
+    .mine-cell.revealed{background:rgba(255,255,255,.03);border-color:transparent;cursor:default}
+    .mine-cell.flagged{background:rgba(255,209,102,.14);border-color:rgba(255,209,102,.3)}
+    .mine-cell.mine-hit{background:rgba(255,123,147,.28);border-color:rgba(255,123,147,.55)}
+    .mine-cell.mine-shown{background:rgba(255,123,147,.1)}
+    .m1{color:#7d9bff}.m2{color:#77e2b7}.m3{color:#ff7b93}.m4{color:#c3a6ff}
+    .m5{color:#ffa07a}.m6{color:#40e0d0}.m7{color:#ff69b4}.m8{color:#aab7e8}
+
+    /* ─ Side Panel ─ */
+    .side{padding:16px;display:flex;flex-direction:column;gap:10px}
+    .cardish{border:1px solid var(--line);border-radius:18px;padding:12px;background:rgba(255,255,255,.04)}
+    .room-link{width:100%;padding:11px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--txt)}
+    .room-status{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .seat{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;background:rgba(125,155,255,.12);border:1px solid rgba(125,155,255,.25)}
+    .seat.good{background:rgba(119,226,183,.12);border-color:rgba(119,226,183,.25)}
+    .seat.warn{background:rgba(255,209,102,.12);border-color:rgba(255,209,102,.25)}
+
+    /* ─ Overlay / Endcard ─ */
+    .overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(7,16,31,.35),rgba(7,16,31,.78));backdrop-filter:blur(4px);z-index:5;border-radius:24px}
+    .overlay .box{min-width:min(92%,420px);max-width:92%;border-radius:22px;background:rgba(14,22,44,.95);border:1px solid rgba(255,255,255,.12);padding:18px;box-shadow:var(--shadow);animation:popIn .22s ease}
+    .result-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .result-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+    .result-badge.win{background:rgba(119,226,183,.12);border-color:rgba(119,226,183,.25)}
+    .result-badge.loss{background:rgba(255,123,147,.12);border-color:rgba(255,123,147,.25)}
+    .result-badge.draw{background:rgba(255,209,102,.12);border-color:rgba(255,209,102,.25)}
+    .footer-note{color:var(--muted);font-size:.9rem;line-height:1.5;text-align:center;max-width:640px}
+    .muted{color:var(--muted)}.small{font-size:.88rem}
+    .hr{height:1px;background:var(--line);margin:14px 0}
+
+    /* ─ Responsive ─ */
+    @media(max-width:1100px){.layout{grid-template-columns:1fr}.main{min-height:auto}}
+    @media(max-width:720px){
+      .cards{grid-template-columns:1fr}.clues{grid-template-columns:1fr}
+      .guess-row{grid-template-columns:repeat(5,46px)}.letter{width:46px;height:46px}
+      .tic{grid-template-columns:repeat(3,76px)}.tic .cell{width:76px;height:76px}
+      .connect{grid-template-columns:repeat(7,46px);gap:6px}.connect .slot{width:46px;height:46px}.chip{width:32px;height:32px}
+      .checkers .cell,.chess .cell,.battle .cell{width:42px;height:42px}
+      .grid-2048{grid-template-columns:repeat(4,62px);gap:8px;padding:10px}.tile-2048{width:62px;height:62px;font-size:1.05rem}
+      .t128,.t256{font-size:.88rem}.t1024,.t2048,.t4096{font-size:.76rem}
     }
   </style>
 </head>
@@ -169,732 +213,708 @@
     <div class="top">
       <div class="brand">
         <div class="mark">GH</div>
-        <div>
-          <h1>GameHub</h1>
-          <p>Free GitHub Pages games with synced rooms</p>
-        </div>
+        <div><h1>GameHub</h1><p>Free GitHub Pages games with live rooms</p></div>
       </div>
       <div class="top-actions">
         <span id="status" class="pill">Ready</span>
-        <button id="homeBtn" class="btn" style="display:none">Home</button>
+        <button id="homeBtn" class="btn" style="display:none">&#8592; Home</button>
       </div>
     </div>
     <div id="app"></div>
   </div>
-
 <script>
-const CONFIG = { backendUrl: "https://script.google.com/macros/s/AKfycby2U1FkwT81mcVy4w2XFDqlnOdylL8PfDDJUrkj9UjeMnOgxf41MMb9pWrz4e3innYp/exec" };
-const WORDS = {
-  easy: ['PLANE','TRAIN','APPLE','STONE','GRASS','BREAD','SHORE','SMILE','CLOUD','WATER'],
-  medium: ['CIPHER','PLANET','POCKET','MOTION','RIDDLE','ORANGE','MARKET','SPRING','VELVET','SHADOW'],
-  hard: ['QUARTZ','JUNGLE','MURKY','EXHALE','VYING','OBJECT','WIZARD','TROPHY','PYTHON','TANGLE']
-};
-const CROSSWORDS = [
-  { name:'City & Nature', grid:[['C','L','O','U','D'],['A',null,'R',null,'R'],['N','E','S','T',null],['D',null,'T',null,'A'],['Y','A','R','D','S']], clues:{ across:['1. White thing in the sky after rain (5)','3. Bird home (4)','4. Outdoor space around a house (5)'], down:['1. Sweet treat / candy land (5)','2. Opposite of up, in some contexts (5)','3. To support or hold (5)'] } },
-  { name:'Everyday Mix', grid:[['S','T','A','R',null],['T',null,'O',null,'P'],['O','N','E',null,'E'],[null,null,'N',null,'A'],['R','A','I','N',null]], clues:{ across:['1. Shines in the night sky (4)','2. The number before two (3)','3. Weather from the clouds (4)'], down:['1. A dramatic water body clue (5)','2. To move downward or to the side (4)','3. The center of a target (4)'] } }
-];
-const PIECES = { w:{k:'♔',q:'♕',r:'♖',b:'♗',n:'♘',p:'♙'}, b:{k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'} };
+/* ════════════════════════════════════════════════════════
+   CONFIG
+════════════════════════════════════════════════════════ */
+const CONFIG = { backendUrl: 'https://script.google.com/macros/s/AKfycby2U1FkwT81mcVy4w2XFDqlnOdylL8PfDDJUrkj9UjeMnOgxf41MMb9pWrz4e3innYp/exec' };
 
+/* ════════════════════════════════════════════════════════
+   WORD LISTS  (all strictly 5 letters)
+════════════════════════════════════════════════════════ */
+const WORDS = {
+  easy:   ['PLANE','TRAIN','APPLE','STONE','GRASS','BREAD','SHORE','SMILE','CLOUD','WATER',
+            'HEART','LIGHT','HAPPY','MONEY','WORLD','MUSIC','RIVER','NIGHT','FLAME','STORM'],
+  medium: ['CRISP','SWEPT','GLOOM','BLAZE','FROST','PIVOT','TWIST','SNARE','BRISK','FLANK',
+            'PRAWN','CREAK','FIZZY','GROAN','MULCH','TROUT','BLEND','DROVE','WRECK','FLUTE'],
+  hard:   ['MURKY','VYING','WRATH','CYNIC','KNAVE','GLYPH','PYGMY','TRYST','NYMPH','CRYPT',
+            'BYLAW','JUICY','KUDOS','SCAMP','THYME','VIVID','EPOCH','STIFF','FROWN','BLUNT']
+};
+const VALID_WORDS = new Set([
+  ...WORDS.easy, ...WORDS.medium, ...WORDS.hard,
+  ...'ABOUT ABOVE ABUSE ACTOR ACUTE ADMIT ADOPT ADULT AFTER AGAIN AGENT AGREE AHEAD ALARM ALBUM ALERT ALIEN ALIGN ALIKE ALIVE ALLEY ALLOW ALONE ALONG ALTER ANGEL ANGER ANGLE ANGRY ANKLE APART APPLY ARENA ARGUE ARISE ARMOR AROMA ARRAY ARROW ASIDE ASSET ATLAS ATTIC AUDIO AVOID AWAKE AWARD AWARE AWFUL AWOKE BASIC BASIS BATCH BEACH BEARD BEAST BEGIN BEING BELOW BENCH BIRTH BLACK BLADE BLAME BLAND BLAST BLIND BLOCK BLOOD BLOOM BLOWN BOARD BOOST BOOTH BOUND BRAIN BRAVE BREAD BREAK BRICK BRIDE BRIEF BRING BROAD BROOK BRUSH BUILD BUILT BUNCH BURST CABIN CABLE CARRY CATCH CAUSE CHAIN CHAIR CHAOS CHARM CHART CHASE CHEAP CHECK CHEEK CHESS CHEST CHIEF CHILD CIVIC CIVIL CLAIM CLASS CLEAN CLEAR CLICK CLIFF CLOCK CLONE CLOSE CLOTH CLOUD COACH COAST COLOR COMMA CORAL COUNT COURT COVER CRACK CRASH CRAZY CREAM CREEK CREST CRIME CROSS CROWD CRUEL CRUSH CURVE CYCLE DANCE DEATH DECAY DELAY DEPTH DEVIL DIRTY DOUBT DOUGH DRAFT DRAIN DRAMA DRANK DREAM DRINK DRIVE DROVE DROWN DRUNK DUSTY EAGLE EARLY EARTH EIGHT ELECT EMPTY ENEMY ENTER ENTRY EQUAL ERROR EVENT EXACT EXTRA FAINT FAITH FALSE FANCY FAULT FEAST FENCE FEVER FIELD FIFTH FIFTY FIGHT FINAL FIRST FIXED FLAME FLASH FLEET FLESH FLOAT FLOOR FLUSH FLUTE FOCUS FORCE FORGE FORTH FOUND FRAME FRANK FRAUD FRESH FRONT FROST FROZE FRUIT FULLY FUNNY GIANT GIVEN GLASS GLIDE GLOBE GLOOM GLOSS GLOVE GRAIN GRAND GRANT GRAPE GRAPH GRASP GRASS GRAVE GRAZE GREAT GREED GREEN GRILL GROAN GROUP GROVE GUARD GUESS GUIDE GUILD GUILT HABIT HARSH HEART HEAVY HENCE HINGE HONEY HONOR HORSE HOTEL HOUSE HUMAN HURRY IDEAL IMAGE INDEX INNER INPUT ISSUE JEWEL JOINT JUDGE JUICE KNIFE KNOCK KNOWN LABEL LANCE LARGE LASER LATER LAUGH LAYER LEARN LEAST LEGAL LEVEL LIGHT LIMIT LIVER LOCAL LODGE LOGIC LOOSE LOWER LOYAL LUCKY LYRIC MAGIC MAJOR MAKER MAPLE MANOR MARSH MEDAL MEDIA MERCY MERIT METAL MIGHT MINOR MINUS MIXED MODEL MONEY MONTH MORAL MOTEL MOUNT MOUSE MOUTH MOVIE MUSIC NAIVE NERVE NEVER NIGHT NOBLE NOISE NORTH NOTED NOVEL NURSE OCCUR OCEAN OFFER OFTEN ORDER OTHER OUTER OWNER OXIDE PAINT PANIC PANEL PAPER PARTY PASTA PATCH PAUSE PEACE PEACH PENNY PHASE PHONE PHOTO PIANO PIXEL PLACE PLAIN PLANT PLATE PLAZA POINT POLAR POUND POWER PRESS PRICE PRIME PRIOR PROBE PRONE PROOF PROUD PROVE PULSE PUNCH PUPIL QUEEN QUERY QUEST QUICK QUIET QUOTA QUOTE RADAR RADIO RANGE RAPID REACH READY REALM REBEL REIGN RELAY RESET RIDER RIDGE RIGHT RISKY RIVER ROBOT ROCKY ROUGE ROUGH ROUND ROUTE ROYAL RUGBY RULER RURAL RUSTY SADLY SAINT SALAD SAUCE SCALE SCENE SCOUT SEIZE SENSE SERVE SEVEN SHADE SHAFT SHAKE SHALL SHAME SHAPE SHARE SHARK SHARP SHEEP SHELF SHELL SHIFT SHINE SHIRT SHOCK SHORE SHORT SIGHT SINCE SIXTH SIXTY SKILL SKULL SLATE SLAVE SLEEP SLICE SLIDE SLOPE SMALL SMART SMELL SMILE SMOKE SOLID SOLVE SORRY SOUND SOUTH SPACE SPARK SPEAK SPEED SPEND SPINE SPLIT SPOKE SPORT SPRAY STACK STAFF STAGE STAIN STALE STAMP STAND START STATE STEAM STEEL STEEP STICK STIFF STILL STOCK STONE STOOD STORE STORM STORY STOVE SWIFT SWORD TABLE TAKEN TASTE TEACH TEARS TEETH THANK THEME THINK THIRD THOSE THREW THROW THUMB TIGER TIGHT TIMES TIRED TITLE TODAY TOPIC TOTAL TOUCH TOUGH TOWER TOXIC TRACE TRACK TRADE TRAIL TRAIN TRAIT TRASH TREAT TREND TRIAL TRICK TRIED TRULY TRUST TRUTH TUMOR TWICE ULTRA UNCLE UNDER UNTIL UPPER UPSET USUAL UTTER VALID VALUE VALVE VAPOR VAULT VERSE VIDEO VIGOR VIRAL VIRUS VISIT VITAL VIVID VOCAL VOICE VOTER WASTE WATCH WATER WEARY WEAVE WEDGE WEIGH WEIRD WHEEL WHERE WHICH WHILE WHOLE WHOSE WITCH WOMAN WORLD WORRY WORSE WORST WORTH WOULD WOUND WRIST WRITE WROTE YEARN YIELD YOUNG YOUTH ZESTY BOXER PLUMB CHASM SHRUB DRONE TRAMP SWAMP BROOD SPECK STOUT FJORD KNELT LYMPH ABYSS EPOCH BLUNT CLUNG SWORE KNEEL CRYPT BYLAW KUDOS SCAMP THYME VIVID NYMPH PYGMY GLYPH KNAVE CYNIC WRATH VYING MURKY FLAIR GUSTO TEMPO VALOR QUIRK WALTZ OXIDE PIXEL RIVET SIREN DEPOT SOLAR LUNAR BISON HERON FINCH OCTET BRISK FLANK PRAWN CREAK FIZZY MULCH TROUT BLEND DROVE WRECK SWEPT GLOOM BLAZE FROST PIVOT TWIST SNARE'
+    .split(' ').filter(w => w.length === 5)
+]);
+
+/* ════════════════════════════════════════════════════════
+   CROSSWORD DATA
+════════════════════════════════════════════════════════ */
+const CROSSWORDS = [
+  {name:'City & Nature',grid:[['C','L','O','U','D'],['A',null,'R',null,'R'],['N','E','S','T',null],['D',null,'T',null,'A'],['Y','A','R','D','S']],
+   clues:{across:['1. White shape in the sky (5)','3. Bird home (4)','4. Outdoor green space (5)'],down:['1. Sweet land (5)','2. Stone hard mineral (5)','3. To hold up (5)']}},
+  {name:'Everyday Mix',grid:[['S','T','A','R',null],['T',null,'O',null,'P'],['O','N','E',null,'E'],[null,null,'N',null,'A'],['R','A','I','N',null]],
+   clues:{across:['1. Night sky light (4)','2. First number (3)','3. Weather from clouds (4)'],down:['1. Dramatic water (5)','2. Fall downward (4)','3. On target (4)']}}
+];
+
+/* ════════════════════════════════════════════════════════
+   CHESS PIECE GLYPHS
+════════════════════════════════════════════════════════ */
+const PIECES = {
+  w:{k:'&#9812;',q:'&#9813;',r:'&#9814;',b:'&#9815;',n:'&#9816;',p:'&#9817;'},
+  b:{k:'&#9818;',q:'&#9819;',r:'&#9820;',b:'&#9821;',n:'&#9822;',p:'&#9823;'}
+};
+
+/* ════════════════════════════════════════════════════════
+   APP STATE
+════════════════════════════════════════════════════════ */
+const S = {
+  screen:'home', game:null, room:null, me:null, token:null,
+  solo:{sudoku:null,wordle:null,crossword:null,twenty48:null,minesweeper:null},
+  pending:false, lastSynced:null, pollTimer:null, notesMode:false,
+  // local UI state (never synced)
+  localSelect:null, localLegal:[],
+  battleOrient:'H', battleAwaitingLock:false, lastConnect4:null
+};
+
+/* ════════════════════════════════════════════════════════
+   DOM
+════════════════════════════════════════════════════════ */
 const app = document.getElementById('app');
 const statusEl = document.getElementById('status');
 const homeBtn = document.getElementById('homeBtn');
-const S = {
-  screen:'home', game:null, room:null, me:null, token:null,
-  solo:{ sudoku:null, wordle:null, crossword:null },
-  pending:false, lastSynced:null, pollTimer:null, notesMode:false,
-  selectedShip:null, shipMode:'tap' // tap/drop
-};
 
-function setStatus(msg, pending=false){
-  statusEl.textContent = msg || 'Ready';
-  S.pending = pending;
-  renderSync();
+/* ════════════════════════════════════════════════════════
+   UTILITIES
+════════════════════════════════════════════════════════ */
+function setStatus(msg,pending=false){statusEl.textContent=msg||'Ready';S.pending=pending;renderSync();}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function qs(k){return new URLSearchParams(location.search).get(k);}
+function seatName(s){return s==='A'?'Player A':s==='B'?'Player B':'—';}
+function otherSeat(s){return s==='A'?'B':'A';}
+function gameLabel(g){return ({sudoku:'Sudoku',wordle:'Wordle',crossword:'Mini Crossword',ttt:'Tic-Tac-Toe',connect4:'Connect Four',checkers:'Checkers',chess:'Chess',battleship:'Battleship',twenty48:'2048',minesweeper:'Minesweeper'})[g]||'Game';}
+function inside(r,c){return r>=0&&c>=0&&r<8&&c<8;}
+function inside6(r,c){return r>=0&&c>=0&&r<6&&c<6;}
+function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=0|Math.random()*(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pick(arr){return arr[0|Math.random()*arr.length];}
+function cloneBoard(b){return b.map(r=>r.map(c=>c?{...c}:null));}
+function fmtNow(){try{return new Intl.DateTimeFormat(undefined,{timeStyle:'medium'}).format(new Date());}catch{return new Date().toLocaleTimeString();}}
+function showConfetti(){
+  const colors=['#7d9bff','#77e2b7','#ffd166','#ff7b93','#fff'];
+  for(let i=0;i<55;i++){const el=document.createElement('div');el.className='confetti-piece';const dur=1.4+Math.random()*1.4;el.style.cssText=`left:${Math.random()*100}vw;top:-10px;background:${colors[i%colors.length]};animation:confettiFall ${dur}s ease-in ${Math.random()*.6}s forwards;transform:rotate(${Math.random()*360}deg)`;document.body.appendChild(el);setTimeout(()=>el.remove(),(dur+.9)*1000);}
 }
-function escapeHtml(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function qs(name){ return new URLSearchParams(location.search).get(name); }
-function setQuery(params){ const u = new URL(location.href); Object.entries(params).forEach(([k,v]) => { if (v === null || v === undefined || v === '') u.searchParams.delete(k); else u.searchParams.set(k, v); }); history.replaceState({}, '', u.toString()); }
-function copy(text){ return navigator.clipboard.writeText(text).then(() => setStatus('Copied')).catch(() => setStatus('Copy failed')); }
-function seatName(seat){ return seat === 'A' ? 'Player A' : seat === 'B' ? 'Player B' : '—'; }
-function otherSeat(seat){ return seat === 'A' ? 'B' : 'A'; }
-function gameLabel(game){ return ({ sudoku:'Sudoku', wordle:'Wordle', crossword:'Mini Crossword', ttt:'Tic-Tac-Toe', connect4:'Connect Four', checkers:'Checkers', chess:'Chess', battleship:'Battleship' })[game] || 'Game'; }
-function inside(r,c){ return r>=0 && c>=0 && r<8 && c<8; }
-function inside6(r,c){ return r>=0 && c>=0 && r<6 && c<6; }
-function clone(obj){ return JSON.parse(JSON.stringify(obj)); }
-function shuffle(arr){ const a = arr.slice(); for (let i=a.length-1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
-function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-function fmtTime(d){ try { return new Intl.DateTimeFormat(undefined, { dateStyle:'short', timeStyle:'medium' }).format(d); } catch { return new Date(d).toLocaleString(); } }
 
+/* ════════════════════════════════════════════════════════
+   API  (JSONP)
+════════════════════════════════════════════════════════ */
 function api(params){
-  return new Promise((resolve, reject) => {
-    const cb = '__gh_' + Math.random().toString(36).slice(2);
-    const s = document.createElement('script');
-    const url = new URL(CONFIG.backendUrl);
-    Object.entries(params).forEach(([k,v]) => url.searchParams.set(k, typeof v === 'string' ? v : JSON.stringify(v)));
-    url.searchParams.set('callback', cb);
-    window[cb] = (data) => { cleanup(); resolve(data); };
-    function cleanup(){ delete window[cb]; if (s.parentNode) s.parentNode.removeChild(s); }
-    s.onerror = () => { cleanup(); reject(new Error('Network request failed')); };
-    s.src = url.toString();
-    document.head.appendChild(s);
-    setTimeout(() => { if (window[cb]) { cleanup(); reject(new Error('Request timed out')); } }, 12000);
+  return new Promise((res,rej)=>{
+    const cb='__gh_'+Math.random().toString(36).slice(2);
+    const s=document.createElement('script');
+    const url=new URL(CONFIG.backendUrl);
+    Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='string'?v:JSON.stringify(v)));
+    url.searchParams.set('callback',cb);
+    window[cb]=(d)=>{clean();res(d);};
+    const clean=()=>{delete window[cb];s.parentNode&&s.parentNode.removeChild(s);};
+    s.onerror=()=>{clean();rej(new Error('Network failed'));};
+    s.src=url.toString();document.head.appendChild(s);
+    setTimeout(()=>{if(window[cb]){clean();rej(new Error('Timeout'));}},12000);
   });
 }
 
-function updateUrl(){
-  const u = new URL(location.href);
-  if (S.room?.roomId) u.searchParams.set('room', S.room.roomId); else u.searchParams.delete('room');
-  if (S.game) u.searchParams.set('game', S.game); else u.searchParams.delete('game');
-  history.replaceState({}, '', u.toString());
-}
+/* ════════════════════════════════════════════════════════
+   ROOM PLUMBING
+════════════════════════════════════════════════════════ */
+function syncText(){return S.lastSynced?`Synced ${S.lastSynced}`:'Not synced';}
+function renderSync(){const el=document.getElementById('sync');if(el)el.innerHTML=`${S.pending?'<span class="spinner"></span>':'<span style="width:16px;height:16px;display:inline-block"></span>'}<span>${esc(syncText())}</span>`;}
+function setSyncedNow(){S.lastSynced=fmtNow();setStatus(syncText(),false);renderSync();}
+function updateUrl(){const u=new URL(location.href);S.room?.roomId?u.searchParams.set('room',S.room.roomId):u.searchParams.delete('room');S.game?u.searchParams.set('game',S.game):u.searchParams.delete('game');history.replaceState({},'',u);}
+function shareUrl(){return S.room?`${location.origin}${location.pathname}?room=${encodeURIComponent(S.room.roomId)}&game=${encodeURIComponent(S.room.game)}`:location.href;}
+function startPolling(){stopPolling();S.pollTimer=setInterval(()=>{!document.hidden&&S.room?.roomId&&refreshRoom().catch(()=>{});},2200);}
+function stopPolling(){clearInterval(S.pollTimer);S.pollTimer=null;}
 
-function syncText(){
-  return S.lastSynced ? `Synced @ ${S.lastSynced}` : 'Not synced yet';
-}
-function renderSync(){
-  const el = document.getElementById('sync');
-  if (!el) return;
-  el.innerHTML = `${S.pending ? '<span class="spinner"></span>' : '<span style="width:16px;height:16px;display:inline-block"></span>'}<span>${escapeHtml(syncText())}</span>`;
-}
-function setSyncedNow(){ S.lastSynced = fmtTime(Date.now()); setStatus(syncText(), false); renderSync(); }
-
-function startPolling(){ stopPolling(); S.pollTimer = setInterval(() => { if (!document.hidden && S.room?.roomId) refreshRoom().catch(()=>{}); }, 2200); }
-function stopPolling(){ if (S.pollTimer) clearInterval(S.pollTimer); S.pollTimer = null; }
-
-function roomState(game, starter='A'){
-  if (game === 'ttt') return { game, board:Array(9).fill(''), turnSeat:starter, winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-  if (game === 'connect4') return { game, board:Array.from({length:6},()=>Array(7).fill('')), turnSeat:starter, winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-  if (game === 'checkers'){
-    const board = Array.from({length:8},()=>Array(8).fill(null));
-    for (let r=0;r<3;r++) for (let c=0;c<8;c++) if ((r+c)%2===1) board[r][c]='b';
-    for (let r=5;r<8;r++) for (let c=0;c<8;c++) if ((r+c)%2===1) board[r][c]='r';
-    return { game, board, turnSeat:starter, selected:null, winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-  }
-  if (game === 'chess'){
-    const back = ['r','n','b','q','k','b','n','r'];
-    const board = Array.from({length:8},()=>Array(8).fill(null));
-    for (let c=0;c<8;c++){
-      board[0][c]={t:back[c], c:'b'}; board[1][c]={t:'p', c:'b'};
-      board[6][c]={t:'p', c:'w'}; board[7][c]={t:back[c], c:'w'};
-    }
-    return { game, board, turnSeat:starter, selected:null, legal:[], status:'White to move', winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-  }
-  if (game === 'battleship'){
-    const side = () => ({ board:Array.from({length:6},()=>Array(6).fill('')), shots:Array.from({length:6},()=>Array(6).fill('')), ships:[], placed:false });
-    return { game, phase:'placeA', turnSeat:starter, orient:'H', shipSizes:[3,2,2], shipIndex:0, sides:{A:side(), B:side()}, winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-  }
-  return { game, turnSeat:starter, winner:null, gameOver:false, rematch:{A:false,B:false}, rematchStarter:'A', version:0 };
-}
-
-function makeSudoku(){
-  const base=3, side=9, pattern=(r,c)=>(base*(r%base)+Math.floor(r/base)+c)%side;
-  const rBase=[0,1,2];
-  const rows=shuffle(rBase).flatMap(g=>shuffle(rBase).map(r=>g*base+r));
-  const cols=shuffle(rBase).flatMap(g=>shuffle(rBase).map(c=>g*base+c));
-  const nums=shuffle([1,2,3,4,5,6,7,8,9]);
-  return Array.from({length:side},(_,r)=>Array.from({length:side},(_,c)=>nums[pattern(rows[r], cols[c])]));
-}
-function sudokuSolved(s){ for (let r=0;r<9;r++) for (let c=0;c<9;c++) if (s.board[r][c] !== s.solution[r][c]) return false; return true; }
-function initSudoku(diff='medium'){
-  const solution = makeSudoku();
-  const holes = { easy:34, medium:44, hard:52 }[diff] ?? 44;
-  const board = solution.map(r=>r.slice());
-  shuffle([...Array(81).keys()]).slice(0, holes).forEach(i=>board[Math.floor(i/9)][i%9]=null);
-  S.solo.sudoku = {
-    difficulty:diff, solution, board,
-    fixed:board.map(r=>r.map(v=>v !== null)),
-    selected:[0,0], complete:false,
-    notes:Array.from({length:9},()=>Array.from({length:9},()=>new Set()))
-  };
-}
-function initWordle(diff='medium'){
-  S.solo.wordle = { difficulty:diff, answer:choice(WORDS[diff]), rows:Array.from({length:6},()=>Array(5).fill('')), result:Array.from({length:6},()=>Array(5).fill('')), row:0, col:0, won:false, lost:false, keyState:{} };
-}
-function initCrossword(idx=0){
-  S.solo.crossword = { idx, puzzle:clone(CROSSWORDS[idx]), cells:CROSSWORDS[idx].grid.map(row=>row.map(v=>v ? '' : null)), solved:false };
-}
-
-async function createRoom(game){
-  const res = await api({ action:'createRoom', game, state: JSON.stringify(roomState(game, 'A')) });
-  if (!res.ok) throw new Error(res.error || 'Create room failed');
-  S.room = res.room; S.me = res.seat || 'A'; S.token = res.token;
-  localStorage.setItem(`gh_token_${S.room.roomId}`, S.token);
-  setQuery({room:S.room.roomId, game:S.room.game});
-  setSyncedNow();
-  startPolling();
-  render();
-}
-async function joinRoom(roomId){
-  const cached = localStorage.getItem(`gh_token_${roomId}`);
-  const res = await api({ action:'joinRoom', roomId, token:cached || '', name: localStorage.getItem('gh_name_pref') || 'Player' });
-  if (!res.ok) throw new Error(res.error || 'Join failed');
-  S.room = res.room; S.me = res.seat || null; S.token = res.token || cached || null;
-  if (S.token) localStorage.setItem(`gh_token_${roomId}`, S.token);
-  setSyncedNow();
-  startPolling();
-  render();
-}
+async function createRoom(game){const res=await api({action:'createRoom',game,state:JSON.stringify(roomState(game,'A'))});if(!res.ok)throw new Error(res.error||'Create failed');S.room=res.room;S.me=res.seat||'A';S.token=res.token;localStorage.setItem(`gh_tok_${S.room.roomId}`,S.token);updateUrl();setSyncedNow();startPolling();render();}
+async function joinRoom(roomId){const cached=localStorage.getItem(`gh_tok_${roomId}`);const res=await api({action:'joinRoom',roomId,token:cached||''});if(!res.ok)throw new Error(res.error||'Join failed');S.room=res.room;S.me=res.seat||null;S.token=res.token||cached||null;if(S.token)localStorage.setItem(`gh_tok_${roomId}`,S.token);setSyncedNow();startPolling();render();}
 async function refreshRoom(){
-  if (!S.room?.roomId) return;
-  const res = await api({ action:'getRoom', roomId:S.room.roomId, token:S.token || '' });
-  if (!res.ok) throw new Error(res.error || 'Fetch failed');
-  S.room = res.room; if (res.seat) S.me = res.seat;
-  setSyncedNow();
-  render();
+  if(!S.room?.roomId)return;
+  const res=await api({action:'getRoom',roomId:S.room.roomId,token:S.token||''});
+  if(!res.ok)throw new Error(res.error||'Fetch failed');
+  S.room=res.room;if(res.seat)S.me=res.seat;
+  if(S.room.state?.turnSeat!==S.me){S.localSelect=null;S.localLegal=[];}
+  setSyncedNow();render();
 }
 async function saveRoomState(){
-  if (!S.room?.roomId || !S.token) return false;
-  S.pending = true; renderSync();
-  const res = await api({ action:'saveState', roomId:S.room.roomId, token:S.token, state: JSON.stringify(S.room.state) });
-  S.pending = false;
-  if (!res.ok){
-    setStatus(res.error || 'Move rejected', false);
-    await refreshRoom().catch(()=>{});
-    return false;
-  }
-  S.room = res.room;
-  setSyncedNow();
-  return true;
+  if(!S.room?.roomId||!S.token)return false;
+  S.pending=true;renderSync();
+  const res=await api({action:'saveState',roomId:S.room.roomId,token:S.token,state:JSON.stringify(S.room.state)});
+  S.pending=false;
+  if(!res.ok){setStatus(res.error||'Move rejected',false);await refreshRoom().catch(()=>{});return false;}
+  S.room=res.room;setSyncedNow();return true;
 }
 
-function goHome(){ S.screen='home'; S.game=null; S.room=null; S.me=null; S.token=null; stopPolling(); updateUrl(); render(); }
+/* ════════════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════════ */
+function resetLocalState(){S.localSelect=null;S.localLegal=[];S.battleOrient='H';S.battleAwaitingLock=false;S.lastConnect4=null;}
+function goHome(){S.screen='home';S.game=null;S.room=null;S.me=null;S.token=null;resetLocalState();stopPolling();updateUrl();render();}
 function openSolo(game){
-  S.screen='solo'; S.game=game;
-  if (game==='sudoku' && !S.solo.sudoku) initSudoku('medium');
-  if (game==='wordle' && !S.solo.wordle) initWordle('medium');
-  if (game==='crossword' && !S.solo.crossword) initCrossword(0);
-  updateUrl();
-  render();
+  S.screen='solo';S.game=game;resetLocalState();
+  if(game==='sudoku'&&!S.solo.sudoku)initSudoku('medium');
+  if(game==='wordle'&&!S.solo.wordle)initWordle('medium');
+  if(game==='crossword'&&!S.solo.crossword)initCrossword(0);
+  if(game==='twenty48'&&!S.solo.twenty48)init2048();
+  if(game==='minesweeper'&&!S.solo.minesweeper)initMinesweeper('easy');
+  updateUrl();render();
 }
 function openMulti(game){
-  S.screen='room'; S.game=game;
-  const roomId = qs('room');
-  if (roomId) joinRoom(roomId).catch(err => { setStatus(err.message, false); render(); });
-  else createRoom(game).catch(err => { setStatus(err.message, false); render(); });
-  updateUrl();
-  render();
-}
-function resetLocal(){ S.solo = { sudoku:null, wordle:null, crossword:null }; setStatus('Local progress reset', false); render(); }
-
-function card(kind,title,desc,btn,action){ return `<div class="card"><div class="badge ${kind==='Solo'?'solo':'multi'}">${kind}</div><h3>${title}</h3><p>${desc}</p><div class="row"><button class="btn primary" data-action="${action}">${btn}</button></div></div>`; }
-
-function renderHome(){
-  return `
-  <div class="shell"><div class="stage">
-    <div class="hero"><div class="hero-inner">
-      <div class="kicker">Free static front end + shared room backend</div>
-      <h2>One platform for solo puzzles and live turn-based rooms.</h2>
-      <p>Solo games run in the browser. Multiplayer rooms use a free shared backend so the board syncs automatically, turns are enforced, and nobody has to keep sending a fresh link after every move.</p>
-      <div class="toolbar" style="margin-top:16px">
-        <button class="btn primary" data-action="resume-room">Resume room</button>
-        <button class="btn" data-action="reset-local">Reset local solo progress</button>
-      </div>
-      <div class="hr"></div>
-      <div class="notice">For multiplayer, deploy the Apps Script backend, paste its web app URL into CONFIG.backendUrl, then host this file on GitHub Pages.</div>
-    </div></div>
-    <div class="panel"><div class="panel-h"><div><div class="section-title">Game library</div><div class="muted small">Pick a solo puzzle or start a shared room</div></div></div>
-      <div class="panel-b">
-        <div class="cards">
-          ${card('Solo','Sudoku','Choose easy, medium, or hard and fill the grid.','Start','solo-sudoku')}
-          ${card('Solo','Wordle','6 guesses with difficulty-based word pools.','Start','solo-wordle')}
-          ${card('Solo','Mini Crossword','Compact crossword-style board with clues.','Start','solo-crossword')}
-          ${card('Multiplayer','Tic-Tac-Toe','Fast room play with enforced turns.','Create room','multi-ttt')}
-          ${card('Multiplayer','Connect Four','Red and yellow chips, live sync.','Create room','multi-connect4')}
-          ${card('Multiplayer','Checkers','Turn-based board with captures.','Create room','multi-checkers')}
-          ${card('Multiplayer','Chess','Legal moves, highlights, and promotion.','Create room','multi-chess')}
-          ${card('Multiplayer','Battleship','Place ships, then fire in battle mode.','Create room','multi-battleship')}
-        </div>
-      </div>
-    </div>
-  </div></div>`;
+  S.screen='room';S.game=game;resetLocalState();
+  const roomId=qs('room');
+  if(roomId)joinRoom(roomId).catch(err=>{setStatus(err.message,false);render();});
+  else createRoom(game).catch(err=>{setStatus(err.message,false);render();});
+  updateUrl();render();
 }
 
-function syncBar(){
-  return `<div class="syncbar"><div id="sync" class="sync-left">${S.pending ? '<span class="spinner"></span>' : '<span style="width:16px;height:16px;display:inline-block"></span>'}<span>${escapeHtml(syncText())}</span></div><div class="muted small">${S.room ? `Room ${escapeHtml(S.room.roomId)}` : 'Local only'}</div></div>`;
+/* ════════════════════════════════════════════════════════
+   ROOM STATE TEMPLATES
+════════════════════════════════════════════════════════ */
+function roomState(game,starter='A'){
+  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  if(game==='checkers'){
+    const board=Array.from({length:8},()=>Array(8).fill(null));
+    for(let r=0;r<3;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='b';
+    for(let r=5;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='r';
+    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  }
+  if(game==='chess'){
+    const back=['r','n','b','q','k','b','n','r'];
+    const board=Array.from({length:8},()=>Array(8).fill(null));
+    for(let c=0;c<8;c++){board[0][c]={t:back[c],c:'b'};board[1][c]={t:'p',c:'b'};board[6][c]={t:'p',c:'w'};board[7][c]={t:back[c],c:'w'};}
+    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  }
+  if(game==='battleship'){
+    const side=()=>({board:Array.from({length:6},()=>Array(6).fill('')),shots:Array.from({length:6},()=>Array(6).fill('')),ships:[],placed:false});
+    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  }
+  return{game,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
 }
-function sidePanel(){
-  const link = updateUrlValue();
-  const seat = S.room ? seatName(S.me) : 'None';
-  const turn = S.room?.state?.turnSeat ? seatName(S.room.state.turnSeat) : '—';
-  return `<div class="side">
-    <div class="cardish"><div class="section-title">Room</div>
-      <div class="room-status" style="margin-bottom:8px">
-        ${S.room ? `<span class="seat good">${seat}</span>` : `<span class="seat warn">No room</span>`}
-        ${S.room ? `<span class="seat">Turn: ${turn}</span>` : ''}
-        ${S.room ? `<span class="seat">${gameLabel(S.room.game)}</span>` : ''}
-      </div>
-      <input class="room-link" value="${escapeHtml(link)}" readonly onclick="this.select()" />
-      <div class="toolbar" style="margin-top:10px"><button class="btn good" data-action="copy-link">Copy room link</button><button class="btn" data-action="refresh-room">Refresh</button></div>
-    </div>
-    <div class="cardish"><div class="section-title">Live sync</div><div class="muted small">Rooms auto-refresh every 2.2 seconds. The backend rejects moves made by the wrong seat.</div></div>
-    <div class="cardish"><div class="section-title">Room lifetime</div><div class="muted small">Inactive rooms are removed after 24 hours. Finished matches stay visible until both players vote to replay or the room expires.</div></div>
-    <div class="cardish"><div class="section-title">Status</div><div class="muted small">${escapeHtml(statusEl.textContent)}</div></div>
-  </div>`;
-}
-function updateUrlValue(){ return S.room ? `${location.origin}${location.pathname}?room=${encodeURIComponent(S.room.roomId)}&game=${encodeURIComponent(S.room.game)}` : location.href; }
 
-function renderSolo(){
-  const g = S.game;
-  const head = `<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Free browser game, no server required</div></div><div class="toolbar">${g==='sudoku' ? `<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select><button id="notesToggle" class="btn ${S.notesMode ? 'notes-mode' : ''}">${S.notesMode ? 'Notes: On' : 'Notes: Off'}</button>` : ''}${g==='wordle' ? `<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select>` : ''}${g==='crossword' ? `<select id="crosswordPick" class="select">${CROSSWORDS.map((c,i)=>`<option value="${i}" ${i===0?'selected':''}>${c.name}</option>`).join('')}</select>` : ''}<button class="btn warn" data-action="new-solo">New</button></div></div>`;
-  const body = g==='sudoku' ? renderSudoku() : g==='wordle' ? renderWordle() : renderCrossword();
-  return `<div class="shell"><div class="stage"><div class="layout"><div class="main">${head}<div class="body scene-wrap"><div class="scene">${syncBar()}${body}</div></div></div>${sidePanel()}</div></div></div>`;
-}
-function renderRoom(){
-  const g = S.game;
-  const head = `<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Live room: <strong>${S.room ? S.room.roomId : '...'}</strong></div></div><div class="toolbar"><button class="btn good" data-action="copy-link">Copy room link</button><button class="btn warn" data-action="new-room">New room</button></div></div>`;
-  const body = !S.room ? `<div class="soft">Joining room…</div>` : g==='ttt' ? renderTTT() : g==='connect4' ? renderConnect4() : g==='checkers' ? renderCheckers() : g==='chess' ? renderChess() : renderBattleship();
-  const overlay = S.room && S.room.state?.gameOver ? renderEndcard() : '';
-  return `<div class="shell"><div class="stage"><div class="layout"><div class="main" style="position:relative">${overlay}${head}<div class="body scene-wrap"><div class="scene">${syncBar()}${body}</div></div></div>${sidePanel()}</div></div></div>`;
-}
-function render(){ homeBtn.style.display = S.screen === 'home' ? 'none' : 'inline-flex'; app.innerHTML = S.screen === 'home' ? renderHome() : (S.screen === 'solo' ? renderSolo() : renderRoom()); renderSync(); }
-
+/* ════════════════════════════════════════════════════════
+   SUDOKU
+════════════════════════════════════════════════════════ */
+function makeSudoku(){const b=3,s=9,pat=(r,c)=>(b*(r%b)+Math.floor(r/b)+c)%s;const rb=[0,1,2];const rows=shuffle(rb).flatMap(g=>shuffle(rb).map(r=>g*b+r));const cols=shuffle(rb).flatMap(g=>shuffle(rb).map(c=>g*b+c));const nums=shuffle([1,2,3,4,5,6,7,8,9]);return Array.from({length:s},(_,r)=>Array.from({length:s},(_,c)=>nums[pat(rows[r],cols[c])]));}
+function initSudoku(diff='medium'){const sol=makeSudoku();const holes={easy:34,medium:44,hard:52}[diff]||44;const board=sol.map(r=>[...r]);shuffle([...Array(81).keys()]).slice(0,holes).forEach(i=>board[0|i/9][i%9]=null);S.solo.sudoku={diff,sol,board,fixed:board.map(r=>r.map(v=>v!==null)),sel:[0,0],done:false,notes:Array.from({length:9},()=>Array.from({length:9},()=>new Set()))};}
+function sudokuDone(s){for(let r=0;r<9;r++)for(let c=0;c<9;c++)if(s.board[r][c]!==s.sol[r][c])return false;return true;}
+function sudokuSet(r,c,v){const s=S.solo.sudoku;if(s.fixed[r][c])return;if(S.notesMode&&v){const n=+v;s.notes[r][c].has(n)?s.notes[r][c].delete(n):s.notes[r][c].add(n);}else{s.board[r][c]=v?+v:null;if(!v)s.notes[r][c].clear();s.done=sudokuDone(s);if(s.done)setTimeout(showConfetti,100);}render();}
+function sudokuMove(dir){const s=S.solo.sudoku;let[r,c]=s.sel;if(dir==='up')r--;if(dir==='down')r++;if(dir==='left')c--;if(dir==='right')c++;s.sel=[Math.max(0,Math.min(8,r)),Math.max(0,Math.min(8,c))];render();}
 function renderSudoku(){
-  const s = S.solo.sudoku;
-  const cells = s.board.flatMap((row,r)=>row.map((v,c)=>{
-    const fixed = s.fixed[r][c];
-    const sel = s.selected[0]===r && s.selected[1]===c;
-    const notes = s.notes[r][c];
-    const notesHtml = !fixed && S.notesMode ? `<div class="tiny-note">${[1,2,3,4,5,6,7,8,9].map(n => notes.has(n) ? n : '&nbsp;').join('')}</div>` : '';
-    return fixed ? `<div class="cell input hint ${sel ? 'selected' : ''}">${v}</div>` : `<div class="cell input ${sel ? 'selected' : ''}" data-action="sudoku-cell" data-r="${r}" data-c="${c}"><div style="display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%"><div>${v || ''}</div>${notesHtml}</div></div>`;
+  const s=S.solo.sudoku;
+  const cells=s.board.flatMap((row,r)=>row.map((v,c)=>{
+    const fix=s.fixed[r][c],sel=s.sel[0]===r&&s.sel[1]===c;
+    if(fix)return `<div class="cell hint${sel?' selected':''}" style="font-size:.95rem">${v}</div>`;
+    const notes=s.notes[r][c];
+    const noteHtml=S.notesMode&&notes.size?`<div class="tiny-note">${[1,2,3,4,5,6,7,8,9].map(n=>`<span>${notes.has(n)?n:''}</span>`).join('')}</div>`:'';
+    return `<div class="cell${sel?' selected':''}" data-action="sudoku-sel" data-r="${r}" data-c="${c}" style="font-size:${noteHtml?'.7rem':'1rem'};flex-direction:column">${noteHtml||''}${!noteHtml&&v?v:''}</div>`;
   })).join('');
-  return `<div class="scene"><div class="notice wide">Select a cell, then type a number. Notes mode lets you mark candidate numbers in the corner of each cell.</div><div class="boardbox"><div class="board sudoku-grid">${cells}</div></div><div class="toolbar">${[1,2,3,4,5,6,7,8,9].map(n => `<button class="btn" data-action="sudoku-num" data-n="${n}">${n}</button>`).join('')}<button class="btn danger" data-action="sudoku-clear">⌫</button></div><div class="notes"><button class="btn ${S.notesMode ? 'notes-mode' : ''}" data-action="toggle-notes">${S.notesMode ? 'Notes: On' : 'Notes: Off'}</button><div class="soft">Thicker borders show each 3×3 block.</div></div><div class="footer-note">${s.complete ? 'Solved.' : 'Use arrow keys to move. Press N to toggle notes.'}</div></div>`;
-}
-function sudokuSolvedLocal(s){ for(let r=0;r<9;r++) for(let c=0;c<9;c++) if(s.board[r][c] !== s.solution[r][c]) return false; return true; }
-function sudokuSet(r,c,val){
-  const s = S.solo.sudoku; if (s.fixed[r][c]) return;
-  if (S.notesMode && val && /^\d$/.test(String(val))) {
-    const n = Number(val); if (s.notes[r][c].has(n)) s.notes[r][c].delete(n); else s.notes[r][c].add(n);
-  } else {
-    s.board[r][c] = val ? Number(val) : null;
-    if (!val) s.notes[r][c].clear();
-    s.complete = sudokuSolvedLocal(s);
-  }
-  render();
-}
-function sudokuMove(dir){
-  const s = S.solo.sudoku; const [r,c] = s.selected;
-  s.selected = [Math.max(0, Math.min(8, r + (dir==='down'?1:dir==='up'?-1:0))), Math.max(0, Math.min(8, c + (dir==='right'?1:dir==='left'?-1:0)))];
-  render();
+  return `<div class="scene"><div class="notice wide${s.done?' win-glow':''}">${s.done?'&#127881; Solved! Well done!':'Select a cell, then type a number. Toggle Notes mode to pencil in candidates.'}</div><div class="boardbox"><div class="board sudoku-grid">${cells}</div></div><div class="toolbar">${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="btn" data-action="sudoku-num" data-n="${n}">${n}</button>`).join('')}<button class="btn danger" data-action="sudoku-clr">&#9003;</button></div><div class="toolbar"><button class="btn${S.notesMode?' notes-mode':''}" data-action="toggle-notes">${S.notesMode?'&#9998; Notes: On':'Notes: Off'}</button><span class="muted small">Arrow keys to navigate &nbsp;|&nbsp; N = toggle notes</span></div></div>`;
 }
 
+/* ════════════════════════════════════════════════════════
+   WORDLE  (fixed: 5-letter words only, A-Z keyboard, word validation)
+════════════════════════════════════════════════════════ */
+function initWordle(diff='medium'){S.solo.wordle={diff,answer:pick(WORDS[diff]),rows:Array.from({length:6},()=>Array(5).fill('')),result:Array.from({length:6},()=>Array(5).fill('')),row:0,col:0,won:false,lost:false,keys:{}};}
+function wKey(ch){const w=S.solo.wordle;if(w.won||w.lost||w.col>=5)return;w.rows[w.row][w.col++]=ch;render();}
+function wBack(){const w=S.solo.wordle;if(w.won||w.lost||w.col<=0)return;w.rows[w.row][--w.col]='';render();}
+function wSetKey(ch,st){const w=S.solo.wordle;const ord={absent:0,present:1,correct:2};if(!w.keys[ch]||ord[st]>ord[w.keys[ch]])w.keys[ch]=st;}
+function wEnter(){
+  const w=S.solo.wordle;if(w.won||w.lost)return;
+  if(w.col<5){const row=document.querySelectorAll('.guess-row')[w.row];if(row){row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');}setStatus('Need 5 letters',false);return;}
+  const guess=w.rows[w.row].join('').toUpperCase();
+  if(!VALID_WORDS.has(guess)){const row=document.querySelectorAll('.guess-row')[w.row];if(row){row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');}setStatus('Not a valid word — try another!',false);return;}
+  const ans=w.answer.toUpperCase();
+  const result=Array(5).fill('absent');const pool=ans.split('');
+  for(let i=0;i<5;i++)if(guess[i]===ans[i]){result[i]='correct';pool[i]=null;}
+  for(let i=0;i<5;i++){if(result[i]==='correct')continue;const idx=pool.indexOf(guess[i]);if(idx!==-1){result[i]='present';pool[idx]=null;}}
+  const cm={correct:'green',present:'gold',absent:'gray'};
+  w.result[w.row]=result.map(x=>cm[x]);
+  guess.split('').forEach((ch,i)=>wSetKey(ch,result[i]));
+  if(guess===ans){w.won=true;setTimeout(showConfetti,300);}
+  else if(w.row===5)w.lost=true;
+  else{w.row++;w.col=0;}
+  render();
+}
 function renderWordle(){
-  const w = S.solo.wordle;
-  const rows = w.rows.map((row,r)=>`<div class="guess-row">${row.map((ch,c)=>`<div class="letter ${w.result[r][c] || ''}">${ch || ''}</div>`).join('')}</div>`).join('');
-  const keys = 'QWERTYUIOPASDFGHJKLZXCVBNM'.split('').map(ch=>`<button class="btn ${w.keyState[ch] ? `used ${w.keyState[ch]}` : ''}" data-action="wordle-key" data-ch="${ch}">${ch}</button>`).join('');
-  return `<div class="scene"><div class="notice wide">The keyboard now remembers letters you already tried and colors them by result.</div><div class="word-grid">${rows}</div><div class="kbd">${keys}</div><div class="toolbar"><button class="btn" data-action="wordle-enter">Enter</button><button class="btn danger" data-action="wordle-back">Delete</button></div>${w.won ? `<div class="notice">Solved.</div>` : ''}${w.lost ? `<div class="notice">Answer: <strong>${w.answer}</strong></div>` : ''}</div>`;
-}
-function setWordleKey(ch, state){
-  const w = S.solo.wordle;
-  const order = { absent:0, present:1, correct:2 };
-  if (!w.keyState[ch] || order[state] > order[w.keyState[ch]]) w.keyState[ch] = state;
-}
-function wordleKey(ch){ const w = S.solo.wordle; if (w.won || w.lost) return; if (w.col < 5){ w.rows[w.row][w.col] = ch; w.col++; render(); } }
-function wordleBack(){ const w = S.solo.wordle; if (w.won || w.lost) return; if (w.col > 0){ w.col--; w.rows[w.row][w.col] = ''; render(); } }
-function wordleEnter(){
-  const w = S.solo.wordle;
-  if (w.won || w.lost) return;
-  if (w.col < 5) { setStatus('Need 5 letters', false); return; }
-  const guess = w.rows[w.row].join('').toUpperCase();
-  const ans = w.answer.toUpperCase();
-  const result = Array(5).fill('absent');
-  const pool = ans.split('');
-  for (let i=0;i<5;i++) if (guess[i] === ans[i]) { result[i]='correct'; pool[i]=null; }
-  for (let i=0;i<5;i++){ if (result[i]==='correct') continue; const idx = pool.indexOf(guess[i]); if (idx !== -1){ result[i]='present'; pool[idx]=null; } }
-  w.result[w.row] = result.map(x => x === 'correct' ? 'green' : x === 'present' ? 'gold' : 'gray');
-  guess.split('').forEach((ch,i)=>setWordleKey(ch, result[i]));
-  if (guess === ans) w.won = true; else if (w.row === 5) w.lost = true; else { w.row++; w.col = 0; }
-  render();
+  const w=S.solo.wordle;
+  const rows=w.rows.map((row,r)=>`<div class="guess-row">${row.map((ch,c)=>`<div class="letter ${w.result[r][c]||''}${ch&&!w.result[r][c]?' filled':''}">${ch||''}</div>`).join('')}</div>`).join('');
+  const keys='ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(ch=>`<button class="btn${w.keys[ch]?' used '+w.keys[ch]:''}" data-action="wkey" data-ch="${ch}">${ch}</button>`).join('');
+  return `<div class="scene"><div class="notice wide">${w.won?'&#127881; You got it!':w.lost?`The word was <strong>${w.answer}</strong> — try again!`:'Guess the 5-letter word in 6 tries.'}</div><div class="word-grid">${rows}</div><div class="kbd">${keys}</div><div class="toolbar"><button class="btn primary" data-action="wenter">Enter</button><button class="btn danger" data-action="wback">&#9003; Delete</button></div></div>`;
 }
 
+/* ════════════════════════════════════════════════════════
+   CROSSWORD
+════════════════════════════════════════════════════════ */
+function initCrossword(idx=0){S.solo.crossword={idx,puzzle:JSON.parse(JSON.stringify(CROSSWORDS[idx])),cells:CROSSWORDS[idx].grid.map(r=>r.map(v=>v?'':null)),solved:false};}
+function cwSet(r,c,v){const x=S.solo.crossword;if(x.puzzle.grid[r][c]===null)return;x.cells[r][c]=(v||'').toUpperCase().slice(0,1);x.solved=x.puzzle.grid.every((row,rr)=>row.every((cell,cc)=>cell===null||x.cells[rr][cc]===cell));if(x.solved)setTimeout(showConfetti,100);render();}
 function renderCrossword(){
-  const x = S.solo.crossword;
-  return `<div class="scene"><div class="notice wide">Click a cell and type one letter. This board is centered and sized to stay readable on mobile and desktop.</div><div class="boardbox"><div class="crossword" style="grid-template-columns:repeat(${x.puzzle.grid[0].length}, 42px)">${x.puzzle.grid.flatMap((row,r)=>row.map((cell,c)=>cell === null ? `<div class="cell block">#</div>` : `<div class="cell"><input maxlength="1" value="${x.cells[r][c] || ''}" data-action="crossword-cell" data-r="${r}" data-c="${c}" /></div>`)).join('')}</div></div><div class="clues"><div class="clue"><h4>Across</h4><ol>${x.puzzle.clues.across.map(cl => `<li>${escapeHtml(cl)}</li>`).join('')}</ol></div><div class="clue"><h4>Down</h4><ol>${x.puzzle.clues.down.map(cl => `<li>${escapeHtml(cl)}</li>`).join('')}</ol></div></div>${x.solved ? `<div class="notice">Solved.</div>` : ''}</div>`;
+  const x=S.solo.crossword;
+  const grid=x.puzzle.grid.flatMap((row,r)=>row.map((cell,c)=>cell===null?`<div class="cell block"></div>`:`<div class="cell"><input maxlength="1" value="${x.cells[r][c]||''}" data-action="cw-cell" data-r="${r}" data-c="${c}" /></div>`)).join('');
+  return `<div class="scene"><div class="notice wide${x.solved?' win-glow':''}">${x.solved?'&#127881; Solved!':'Click a cell and type one letter per box.'}</div><div class="boardbox"><div class="crossword" style="grid-template-columns:repeat(${x.puzzle.grid[0].length},40px)">${grid}</div></div><div class="clues"><div class="clue"><h4>Across</h4><ol>${x.puzzle.clues.across.map(cl=>`<li>${esc(cl)}</li>`).join('')}</ol></div><div class="clue"><h4>Down</h4><ol>${x.puzzle.clues.down.map(cl=>`<li>${esc(cl)}</li>`).join('')}</ol></div></div></div>`;
 }
-function crosswordSet(r,c,val){ const x = S.solo.crossword; if (x.puzzle.grid[r][c] === null) return; x.cells[r][c] = (val || '').toUpperCase().slice(0,1); x.solved = x.puzzle.grid.every((row,rr)=>row.every((cell,cc)=>cell === null || x.cells[rr][cc] === cell)); render(); }
 
-function tttWinner(board){ const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]]; return lines.find(([a,b,c]) => board[a] && board[a] === board[b] && board[a] === board[c]); }
-function renderTTT(){ const g = S.room.state; return `<div class="scene"><div class="notice wide">${g.gameOver ? (g.winner === 'D' ? 'Draw.' : `${seatName(g.winner)} wins.`) : `Turn: ${seatName(g.turnSeat)}.`}</div><div class="boardbox"><div class="tic">${g.board.map((v,i)=>`<button class="cell" data-action="ttt-move" data-i="${i}">${v}</button>`).join('')}</div></div><div class="footer-note">Only the seat whose turn it is can move.</div></div>`; }
+/* ════════════════════════════════════════════════════════
+   2048
+════════════════════════════════════════════════════════ */
+function init2048(){const g=Array.from({length:4},()=>Array(4).fill(0));const best=+(localStorage.getItem('gh_2048_best')||0);S.solo.twenty48={g,score:0,best,won:false,continued:false,over:false,newCells:[]};addTile48(S.solo.twenty48);addTile48(S.solo.twenty48);}
+function addTile48(s){const e=[];for(let r=0;r<4;r++)for(let c=0;c<4;c++)if(!s.g[r][c])e.push([r,c]);if(!e.length)return;const[r,c]=pick(e);s.g[r][c]=Math.random()<.9?2:4;s.newCells=[[r,c]];}
+function rotateCW(g){return Array.from({length:4},(_,r)=>Array.from({length:4},(_,c)=>g[3-c][r]));}
+function canMove48(g){for(let r=0;r<4;r++)for(let c=0;c<4;c++){if(!g[r][c])return true;if(c<3&&g[r][c]===g[r][c+1])return true;if(r<3&&g[r][c]===g[r+1][c])return true;}return false;}
+function move2048(dir){
+  const s=S.solo.twenty48;if(s.over)return;
+  const rots={up:3,right:2,down:1,left:0};let g=s.g.map(r=>[...r]);
+  for(let i=0;i<rots[dir];i++)g=rotateCW(g);
+  let moved=false;s.newCells=[];
+  for(let r=0;r<4;r++){const row=g[r].filter(v=>v);const merged=[];for(let i=0;i<row.length;i++){if(i+1<row.length&&row[i]===row[i+1]){merged.push(row[i]*2);s.score+=row[i]*2;i++;}else merged.push(row[i]);}while(merged.length<4)merged.push(0);if(merged.join()!==g[r].join())moved=true;g[r]=merged;}
+  const back=(4-rots[dir])%4;for(let i=0;i<back;i++)g=rotateCW(g);
+  if(moved){s.g=g;if(s.score>s.best){s.best=s.score;localStorage.setItem('gh_2048_best',s.best);}if(!s.won&&g.flat().includes(2048)){s.won=true;setTimeout(showConfetti,200);}addTile48(s);if(!canMove48(s.g))s.over=true;render();}
+}
+function render2048(){
+  const s=S.solo.twenty48;
+  const tiles=s.g.map((row,r)=>row.map((v,c)=>`<div class="tile-2048 t${v>4096?4096:v}${s.newCells.some(([nr,nc])=>nr===r&&nc===c)?' tile-new':''}">${v||''}</div>`).join('')).join('');
+  const winMsg=s.won&&!s.continued?`<div class="notice wide" style="text-align:center">&#127942; You reached 2048! <button class="btn good" data-action="t48-continue" style="margin-left:10px">Keep going &rarr;</button></div>`:'';
+  const overMsg=s.over?`<div class="notice wide" style="text-align:center;border-color:rgba(255,123,147,.3);background:rgba(255,123,147,.08);color:#ff7b93">Game Over &mdash; no moves left!</div>`:'';
+  return `<div class="scene"><div class="score-2048"><div class="score-box"><div class="lbl">Score</div><div class="val">${s.score}</div></div><div class="score-box"><div class="lbl">Best</div><div class="val">${s.best}</div></div></div>${winMsg}${overMsg}<div class="grid-2048">${tiles}</div><div class="footer-note">Arrow keys or swipe to slide tiles &nbsp;&bull;&nbsp; Match tiles to merge &nbsp;&bull;&nbsp; Reach 2048!</div></div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   MINESWEEPER
+════════════════════════════════════════════════════════ */
+function initMinesweeper(diff='easy'){
+  const cfg={easy:[9,9,10],medium:[16,9,25],hard:[16,16,40]}[diff]||[9,9,10];
+  const[cols,rows,mines]=cfg;
+  const board=Array.from({length:rows},()=>Array.from({length:cols},()=>({mine:false,revealed:false,flagged:false,adj:0,hit:false})));
+  S.solo.minesweeper={diff,rows,cols,mines,board,flagMode:false,gameOver:false,won:false,firstClick:true,remaining:rows*cols-mines,flagCount:0,t0:null};
+}
+function mineGen(sr,sc){
+  const s=S.solo.minesweeper;const{rows,cols,mines,board}=s;
+  const safe=new Set();for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=sr+dr,nc=sc+dc;if(nr>=0&&nc>=0&&nr<rows&&nc<cols)safe.add(`${nr},${nc}`);}
+  const pos=[];for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)if(!safe.has(`${r},${c}`))pos.push([r,c]);
+  shuffle(pos).slice(0,mines).forEach(([r,c])=>board[r][c].mine=true);
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){if(board[r][c].mine)continue;let cnt=0;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=r+dr,nc=c+dc;if(nr>=0&&nc>=0&&nr<rows&&nc<cols&&board[nr][nc].mine)cnt++;}board[r][c].adj=cnt;}
+  s.firstClick=false;s.t0=Date.now();
+}
+function mineReveal(r,c){
+  const s=S.solo.minesweeper;if(s.gameOver||s.won)return;
+  const cell=s.board[r][c];if(cell.flagged)return;
+  if(s.flagMode){mineFlag(r,c);return;}
+  if(s.firstClick)mineGen(r,c);
+  if(cell.revealed)return;
+  if(cell.mine){cell.hit=true;s.board.forEach(row=>row.forEach(cl=>{if(cl.mine)cl.revealed=true;}));s.gameOver=true;render();return;}
+  const q=[[r,c]];const vis=new Set();
+  while(q.length){const[cr,cc]=q.shift();const k=`${cr},${cc}`;if(vis.has(k))continue;vis.add(k);const cur=s.board[cr][cc];if(cur.revealed||cur.flagged||cur.mine)continue;cur.revealed=true;s.remaining--;if(cur.adj===0)for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const nr=cr+dr,nc=cc+dc;if(nr>=0&&nc>=0&&nr<s.rows&&nc<s.cols&&!vis.has(`${nr},${nc}`))q.push([nr,nc]);}}
+  if(s.remaining<=0){s.won=true;setTimeout(showConfetti,200);}render();
+}
+function mineFlag(r,c){const s=S.solo.minesweeper;if(s.gameOver||s.won)return;const cell=s.board[r][c];if(cell.revealed)return;if(cell.flagged){cell.flagged=false;s.flagCount--;}else{cell.flagged=true;s.flagCount++;}render();}
+function renderMinesweeper(){
+  const s=S.solo.minesweeper;
+  const elapsed=s.t0?Math.floor((Date.now()-s.t0)/1000):0;
+  const sz=s.cols>9?'width:28px;height:28px;font-size:.76rem':'width:38px;height:38px;font-size:.92rem';
+  const gap=s.cols>9?'2px':'3px';
+  const cells=s.board.flatMap((row,r)=>row.map((cell,c)=>{
+    let cls='mine-cell';let content='';
+    if(cell.revealed){cls+=' revealed';if(cell.mine){cls+=cell.hit?' mine-hit':' mine-shown';content='&#128163;';}else if(cell.adj>0)content=`<span class="m${cell.adj}">${cell.adj}</span>`;}
+    else if(cell.flagged){cls+=' flagged';content='&#128681;';}
+    return `<button class="${cls}" style="${sz}" data-action="mine-reveal" data-r="${r}" data-c="${c}">${content}</button>`;
+  })).join('');
+  const remaining=s.mines-s.flagCount;
+  const statusText=s.won?'&#127881; You cleared the field!':s.gameOver?'&#128165; Boom! Try again.':`&#128163; ${remaining} &nbsp;&bull;&nbsp; &#9201; ${elapsed}s${s.firstClick?' &mdash; tap any cell to start!':''}`;
+  const flagBtn=`<button class="btn${s.flagMode?' good':''}" data-action="mine-flag-toggle">&#128681; ${s.flagMode?'Flag Mode: ON':'Flag Mode: OFF'}</button>`;
+  return `<div class="scene"><div class="notice wide">${statusText}</div><div class="toolbar">${flagBtn}</div><div class="boardbox"><div class="mine-grid" style="grid-template-columns:repeat(${s.cols},${s.cols>9?'28px':'38px'});gap:${gap}">${cells}</div></div><div class="footer-note">Tap to reveal &nbsp;&bull;&nbsp; Flag Mode or long-press to place a flag &nbsp;&bull;&nbsp; Avoid all mines!</div></div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   TIC-TAC-TOE
+════════════════════════════════════════════════════════ */
+function tttLines(){return[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];}
+function tttWin(board){return tttLines().find(([a,b,c])=>board[a]&&board[a]===board[b]&&board[a]===board[c]);}
 async function tttMove(i){
-  await refreshRoom().catch(()=>{});
-  const g = S.room.state;
-  if (g.gameOver || g.board[i] || g.turnSeat !== S.me) return;
-  g.board[i] = S.me === 'A' ? 'X' : 'O';
-  const win = tttWinner(g.board);
-  if (win) { g.winner = S.me; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = otherSeat(S.me); }
-  else if (g.board.every(Boolean)) { g.winner = 'D'; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = 'A'; }
-  else g.turnSeat = otherSeat(g.turnSeat);
-  S.room.state = g;
-  await saveRoomState().catch(()=>{});
-  render();
+  await refreshRoom().catch(()=>{});const g=S.room.state;
+  if(g.gameOver||g.board[i]||g.turnSeat!==S.me)return;
+  g.board[i]=S.me==='A'?'X':'O';
+  if(tttWin(g.board)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
+  else if(g.board.every(Boolean)){g.winner='D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter='A';}
+  else g.turnSeat=otherSeat(g.turnSeat);
+  S.room.state=g;await saveRoomState().catch(()=>{});render();
 }
+function renderTTT(){const g=S.room.state;const win=tttWin(g.board);const winCells=new Set(win||[]);return `<div class="scene"><div class="notice wide">${g.gameOver?(g.winner==='D'?'Draw! Well played.':`${seatName(g.winner)} wins! &#127881;`):`Turn: ${seatName(g.turnSeat)}`}</div><div class="boardbox"><div class="tic">${g.board.map((v,i)=>`<button class="cell${winCells.has(i)?' selected':''}" data-action="ttt-move" data-i="${i}" style="font-size:2.1rem">${v||''}</button>`).join('')}</div></div><div class="footer-note">You are ${seatName(S.me)} &nbsp;&bull;&nbsp; Only your turn allows moves.</div></div>`;}
 
-function connectWinner(board, r, c, p){
-  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
-  for (const [dr,dc] of dirs){
-    let count=1;
-    for (const sgn of [1,-1]){
-      let nr=r+dr*sgn, nc=c+dc*sgn;
-      while (board[nr] && board[nr][nc] === p){ count++; nr += dr*sgn; nc += dc*sgn; }
+/* ════════════════════════════════════════════════════════
+   CONNECT FOUR
+════════════════════════════════════════════════════════ */
+function c4Win(board,r,c,p){const dirs=[[1,0],[0,1],[1,1],[1,-1]];for(const[dr,dc]of dirs){let n=1;for(const sg of[1,-1]){let nr=r+dr*sg,nc=c+dc*sg;while(board[nr]?.[nc]===p){n++;nr+=dr*sg;nc+=dc*sg;}}if(n>=4)return true;}return false;}
+async function connectMove(col){
+  await refreshRoom().catch(()=>{});const g=S.room.state;
+  if(g.gameOver||g.turnSeat!==S.me)return;
+  for(let r=5;r>=0;r--){
+    if(!g.board[r][col]){
+      const disc=g.turnSeat==='A'?'R':'Y';g.board[r][col]=disc;S.lastConnect4=[r,col];
+      if(c4Win(g.board,r,col,disc)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
+      else if(g.board.every(row=>row.every(Boolean))){g.winner='D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter='A';}
+      else g.turnSeat=otherSeat(g.turnSeat);
+      S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
-    if (count >= 4) return true;
   }
-  return false;
 }
 function renderConnect4(){
-  const g = S.room.state;
-  return `<div class="scene"><div class="notice wide">${g.gameOver ? (g.winner === 'D' ? 'Draw.' : `${seatName(g.winner)} wins.`) : `Turn: ${seatName(g.turnSeat)}.`}</div><div class="connectbox"><div class="connect">${[0,1,2,3,4,5,6].map(col=>`<button class="btn" style="grid-row:1" data-action="connect-move" data-col="${col}">▼</button>`).join('')}${g.board.flatMap(row=>row.map(v=>`<div class="slot">${v ? `<div class="chip ${v === 'R' ? 'red' : 'yellow'}"></div>` : ''}</div>`)).join('')}</div></div><div class="footer-note">The board stays a fixed 7×6 grid and chips are rendered with colors.</div></div>`;
-}
-async function connectMove(col){
-  await refreshRoom().catch(()=>{});
-  const g = S.room.state;
-  if (g.gameOver || g.turnSeat !== S.me) return;
-  for (let r=5; r>=0; r--){
-    if (!g.board[r][col]){
-      const disc = g.turnSeat === 'A' ? 'R' : 'Y';
-      g.board[r][col] = disc;
-      if (connectWinner(g.board, r, col, disc)) { g.winner = S.me; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = otherSeat(S.me); }
-      else if (g.board.every(row => row.every(Boolean))) { g.winner = 'D'; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = 'A'; }
-      else g.turnSeat = otherSeat(g.turnSeat);
-      S.room.state = g;
-      await saveRoomState().catch(()=>{});
-      render();
-      return;
-    }
-  }
+  const g=S.room.state;const isMyTurn=g.turnSeat===S.me;
+  const arrows=[0,1,2,3,4,5,6].map(col=>`<button class="btn${isMyTurn&&!g.gameOver?' primary':''}" style="min-height:30px;padding:4px" data-action="c4-move" data-col="${col}">&#9660;</button>`).join('');
+  const chips=g.board.flatMap((row,r)=>row.map((v,c)=>`<div class="slot">${v?`<div class="chip ${v==='R'?'red':'yellow'}${S.lastConnect4&&S.lastConnect4[0]===r&&S.lastConnect4[1]===c?' drop':''}"></div>`:''}</div>`)).join('');
+  return `<div class="scene"><div class="notice wide">${g.gameOver?(g.winner==='D'?'Draw!':`${seatName(g.winner)} wins! &#127881;`):`Turn: ${seatName(g.turnSeat)}`}</div><div class="connectbox"><div class="connect" style="display:grid;grid-template-columns:repeat(7,60px);gap:8px"><div style="display:contents">${arrows}</div>${chips}</div></div><div class="footer-note">Drop a chip by pressing &#9660; above any column. You are ${seatName(S.me)}.</div></div>`;
 }
 
-function pieceSide(piece){ return piece?.toLowerCase() === 'r' ? 'r' : piece?.toLowerCase() === 'b' ? 'b' : null; }
-function checkersMovesFor(board, r, c){
-  const p = board[r][c]; if (!p) return [];
-  const side = pieceSide(p); const dirs = [];
-  if (p === 'r' || p === 'R') dirs.push([-1,-1],[-1,1]);
-  if (p === 'b' || p === 'B') dirs.push([1,-1],[1,1]);
-  if (p === 'R') dirs.push([1,-1],[1,1]);
-  if (p === 'B') dirs.push([-1,-1],[-1,1]);
-  const out = [];
-  for (const [dr,dc] of dirs){
-    const nr=r+dr, nc=c+dc, jr=r+dr*2, jc=c+dc*2;
-    if (inside(nr,nc) && !board[nr][nc]) out.push({r:nr,c:nc,capture:null});
-    if (inside(jr,jc) && board[nr][nc] && pieceSide(board[nr][nc]) !== side && !board[jr][jc]) out.push({r:jr,c:jc,capture:[nr,nc]});
-  }
+/* ════════════════════════════════════════════════════════
+   CHECKERS  (fixed: local selection, no refreshRoom on click)
+════════════════════════════════════════════════════════ */
+function pSide(p){if(!p)return null;const l=p.toLowerCase();return l==='r'?'r':l==='b'?'b':null;}
+function checkMoves(board,r,c){
+  const p=board[r][c];if(!p)return[];const side=pSide(p);
+  const dirs=[];if(p==='r'||p==='R')dirs.push([-1,-1],[-1,1]);if(p==='b'||p==='B')dirs.push([1,-1],[1,1]);if(p==='R')dirs.push([1,-1],[1,1]);if(p==='B')dirs.push([-1,-1],[-1,1]);
+  const out=[];
+  for(const[dr,dc]of dirs){const nr=r+dr,nc=c+dc,jr=r+2*dr,jc=c+2*dc;if(inside(nr,nc)&&!board[nr][nc])out.push({r:nr,c:nc,cap:null});if(inside(jr,jc)&&board[nr][nc]&&pSide(board[nr][nc])!==side&&!board[jr][jc])out.push({r:jr,c:jc,cap:[nr,nc]});}
   return out;
 }
-function renderCheckers(){
-  const g = S.room.state;
-  const targets = g.selected ? checkersMovesFor(g.board, g.selected[0], g.selected[1]) : [];
-  return `<div class="scene"><div class="notice wide">${g.gameOver ? (g.winner === 'D' ? 'Draw.' : `${seatName(g.winner)} wins.`) : `Turn: ${seatName(g.turnSeat)}.`}</div><div class="boardbox"><div class="checkers" style="grid-template-columns:repeat(8, 56px)">${g.board.flatMap((row,r)=>row.map((p,c)=>{ const dark=(r+c)%2===1; const sel=g.selected && g.selected[0]===r && g.selected[1]===c; const tgt=targets.some(m=>m.r===r && m.c===c); const txt=p ? `<span class="piece ${p==='r'||p==='R' ? 'red' : 'black'}">${p==='r'?'⛂':p==='R'?'⛃':p==='b'?'⛀':'⛁'}</span>` : ''; return `<button class="cell ${dark ? 'dark' : 'light'} ${sel ? 'selected' : ''} ${tgt ? 'target' : ''}" data-action="checkers-cell" data-r="${r}" data-c="${c}">${txt}</button>`; })).join('')}</div></div><div class="footer-note">Selected pieces highlight possible moves. Captures are enforced.</div></div>`;
-}
 async function checkersMove(r,c){
-  await refreshRoom().catch(()=>{});
-  const g = S.room.state;
-  const piece = g.board[r][c];
-  if (g.gameOver || g.turnSeat !== S.me) return;
-  if (g.selected){
-    const [sr,sc] = g.selected;
-    const move = checkersMovesFor(g.board, sr, sc).find(m => m.r===r && m.c===c);
-    if (move){
-      g.board[r][c] = g.board[sr][sc];
-      g.board[sr][sc] = null;
-      if (move.capture) g.board[move.capture[0]][move.capture[1]] = null;
-      if (g.board[r][c] === 'r' && r === 0) g.board[r][c] = 'R';
-      if (g.board[r][c] === 'b' && r === 7) g.board[r][c] = 'B';
-      const moreCap = move.capture ? checkersMovesFor(g.board, r, c).some(m => m.capture) : false;
-      if (moreCap) g.selected = [r,c]; else { g.selected = null; g.turnSeat = otherSeat(g.turnSeat); }
-      const side = pieceSide(g.board[r][c]);
-      const oppSide = side === 'r' ? 'b' : 'r';
-      if (!g.board.flat().some(p => p && pieceSide(p) === oppSide)) { g.winner = S.me; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = otherSeat(S.me); }
-      S.room.state = g;
-      await saveRoomState().catch(()=>{});
-      render();
-      return;
+  const g=S.room.state;if(!g||g.gameOver||g.turnSeat!==S.me)return;
+  const mySide=S.me==='A'?'r':'b';const p=g.board[r][c];
+  if(S.localSelect){
+    const[sr,sc]=S.localSelect;const mv=checkMoves(g.board,sr,sc).find(m=>m.r===r&&m.c===c);
+    if(mv){
+      g.board[r][c]=g.board[sr][sc];g.board[sr][sc]=null;
+      if(mv.cap)g.board[mv.cap[0]][mv.cap[1]]=null;
+      if(g.board[r][c]==='r'&&r===0)g.board[r][c]='R';
+      if(g.board[r][c]==='b'&&r===7)g.board[r][c]='B';
+      const moreCap=mv.cap&&checkMoves(g.board,r,c).some(m=>m.cap);
+      if(moreCap){S.localSelect=[r,c];}
+      else{S.localSelect=null;g.turnSeat=otherSeat(g.turnSeat);}
+      const side=pSide(g.board[r][c]);const opp=side==='r'?'b':'r';
+      if(!g.board.flat().some(x=>x&&pSide(x)===opp)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
+      S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
+    if(p&&pSide(p)===mySide&&checkMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
+    else{S.localSelect=null;render();}
+    return;
   }
-  if (piece && ((S.me === 'A' && pieceSide(piece) === 'r') || (S.me === 'B' && pieceSide(piece) === 'b'))){
-    g.selected = [r,c];
-    render();
-  }
+  if(p&&pSide(p)===mySide&&checkMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
+}
+function renderCheckers(){
+  const g=S.room.state;
+  const tgts=S.localSelect?checkMoves(g.board,S.localSelect[0],S.localSelect[1]):[];
+  const cells=g.board.flatMap((row,r)=>row.map((p,c)=>{
+    const dark=(r+c)%2===1;const sel=S.localSelect&&S.localSelect[0]===r&&S.localSelect[1]===c;const tgt=tgts.some(m=>m.r===r&&m.c===c);
+    const icon=p?`<span class="piece ${p==='r'||p==='R'?'red':'black'}">${p==='r'?'&#9920;':p==='R'?'&#9921;':p==='b'?'&#9922;':'&#9923;'}</span>`:'';
+    return `<button class="cell ${dark?'dark':'light'}${sel?' selected':''}${tgt?' target':''}" data-action="ck-cell" data-r="${r}" data-c="${c}">${icon}</button>`;
+  })).join('');
+  return `<div class="scene"><div class="notice wide">${g.gameOver?(g.winner==='D'?'Draw.':`${seatName(g.winner)} wins! &#127881;`):`Turn: ${seatName(g.turnSeat)}`}</div><div class="boardbox"><div class="checkers" style="grid-template-columns:repeat(8,56px)">${cells}</div></div><div class="footer-note">A=Red (moves up) &nbsp;&bull;&nbsp; B=Black (moves down) &nbsp;&bull;&nbsp; Click piece then green cell to move.</div></div>`;
 }
 
-function cloneChessBoard(board){ return board.map(row => row.map(p => p ? {t:p.t, c:p.c} : null)); }
-function findKing(board, side){ for (let r=0;r<8;r++) for (let c=0;c<8;c++){ const p=board[r][c]; if (p && p.t === 'k' && p.c === side) return [r,c]; } return null; }
-function pseudoChessMoves(board, r, c, attackOnly=false){
-  const p = board[r][c];
-  if (!p) return [];
-  const side = p.c;
-  const moves = [];
-  const add = (nr,nc,captureOk=true) => { if (!inside(nr,nc)) return; const t=board[nr][nc]; if (!t) moves.push({r:nr,c:nc}); else if (captureOk && t.c !== side) moves.push({r:nr,c:nc}); };
-  if (p.t === 'p'){
-    const dir = side === 'w' ? -1 : 1, start = side === 'w' ? 6 : 1;
-    if (!attackOnly && !board[r+dir]?.[c]) add(r+dir,c,false);
-    if (!attackOnly && r === start && !board[r+dir]?.[c] && !board[r+dir*2]?.[c]) moves.push({r:r+dir*2,c});
-    for (const dc of [-1,1]){
-      const nr=r+dir, nc=c+dc; if (!inside(nr,nc)) continue;
-      const t = board[nr][nc];
-      if (attackOnly) moves.push({r:nr,c:nc}); else if (t && t.c !== side) moves.push({r:nr,c:nc});
-    }
-  }
-  if (p.t === 'n') [[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));
-  if (p.t === 'b' || p.t === 'r' || p.t === 'q'){
-    const dirs=[]; if (p.t === 'b' || p.t === 'q') dirs.push([1,1],[1,-1],[-1,1],[-1,-1]); if (p.t === 'r' || p.t === 'q') dirs.push([1,0],[-1,0],[0,1],[0,-1]);
-    for (const [dr,dc] of dirs){
-      let nr=r+dr, nc=c+dc;
-      while (inside(nr,nc)){
-        const t = board[nr][nc];
-        if (!t) moves.push({r:nr,c:nc});
-        else { if (t.c !== side) moves.push({r:nr,c:nc}); break; }
-        nr += dr; nc += dc;
-      }
-    }
-  }
-  if (p.t === 'k') for (let dr=-1; dr<=1; dr++) for (let dc=-1; dc<=1; dc++) if (dr || dc) add(r+dr,c+dc);
-  return moves;
+/* ════════════════════════════════════════════════════════
+   CHESS  (fixed: local selection, full legal move check)
+════════════════════════════════════════════════════════ */
+function pseudoMoves(board,r,c,atkOnly=false){
+  const p=board[r][c];if(!p)return[];const sd=p.c;const mv=[];
+  const add=(nr,nc)=>{if(!inside(nr,nc))return;const t=board[nr][nc];if(!t)mv.push({r:nr,c:nc});else if(t.c!==sd)mv.push({r:nr,c:nc});};
+  if(p.t==='p'){const dir=sd==='w'?-1:1,st=sd==='w'?6:1;if(!atkOnly&&!board[r+dir]?.[c]){mv.push({r:r+dir,c});if(r===st&&!board[r+2*dir]?.[c])mv.push({r:r+2*dir,c});}for(const dc of[-1,1]){const nr=r+dir,nc=c+dc;if(!inside(nr,nc))continue;const t=board[nr][nc];if(atkOnly)mv.push({r:nr,c:nc});else if(t&&t.c!==sd)mv.push({r:nr,c:nc});}}
+  if(p.t==='n')[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));
+  const sliders=[];if(p.t==='b'||p.t==='q')sliders.push([1,1],[1,-1],[-1,1],[-1,-1]);if(p.t==='r'||p.t==='q')sliders.push([1,0],[-1,0],[0,1],[0,-1]);
+  for(const[dr,dc]of sliders){let nr=r+dr,nc=c+dc;while(inside(nr,nc)){const t=board[nr][nc];if(!t)mv.push({r:nr,c:nc});else{if(t.c!==sd)mv.push({r:nr,c:nc});break;}nr+=dr;nc+=dc;}}
+  if(p.t==='k')for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)if(dr||dc)add(r+dr,c+dc);
+  return mv;
 }
-function isSquareAttacked(board, r, c, bySide){ for (let sr=0; sr<8; sr++) for (let sc=0; sc<8; sc++){ const p=board[sr][sc]; if (p && p.c === bySide){ const mv = pseudoChessMoves(board, sr, sc, true); if (mv.some(m => m.r === r && m.c === c)) return true; } } return false; }
-function legalChessMoves(board, r, c){ const p = board[r][c]; if (!p) return []; const side=p.c; return pseudoChessMoves(board, r, c, false).filter(m => { const test = cloneChessBoard(board); test[m.r][m.c] = test[r][c]; test[r][c] = null; if (test[m.r][m.c].t === 'p' && (m.r === 0 || m.r === 7)) test[m.r][m.c].t = 'q'; const king = findKing(test, side); if (!king) return false; return !isSquareAttacked(test, king[0], king[1], side === 'w' ? 'b' : 'w'); }); }
+function attacked(board,r,c,bySide){for(let sr=0;sr<8;sr++)for(let sc=0;sc<8;sc++){const p=board[sr][sc];if(p&&p.c===bySide&&pseudoMoves(board,sr,sc,true).some(m=>m.r===r&&m.c===c))return true;}return false;}
+function findKing(board,side){for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=board[r][c];if(p&&p.t==='k'&&p.c===side)return[r,c];}return null;}
+function legalMoves(board,r,c){const p=board[r][c];if(!p)return[];const sd=p.c;return pseudoMoves(board,r,c,false).filter(m=>{const nb=cloneBoard(board);nb[m.r][m.c]=nb[r][c];nb[r][c]=null;if(nb[m.r][m.c].t==='p'&&(m.r===0||m.r===7))nb[m.r][m.c].t='q';const k=findKing(nb,sd);return k&&!attacked(nb,k[0],k[1],sd==='w'?'b':'w');});}
 function updateChessStatus(g){
-  const side = g.turnSeat === 'A' ? 'w' : 'b', opp = side === 'w' ? 'b' : 'w';
-  let any = false;
-  for (let r=0;r<8;r++) for (let c=0;c<8;c++){ const p = g.board[r][c]; if (p && p.c === side && legalChessMoves(g.board, r, c).length) any = true; }
-  const king = findKing(g.board, side);
-  const check = king ? isSquareAttacked(g.board, king[0], king[1], opp) : false;
-  g.status = `${side === 'w' ? 'White' : 'Black'} to move${check ? ' — check' : ''}`;
-  if (!any) { g.winner = check ? (opp === 'w' ? 'A' : 'B') : 'D'; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = g.winner === 'A' ? 'B' : g.winner === 'B' ? 'A' : 'A'; }
-}
-function renderChess(){
-  const g = S.room.state;
-  const legal = g.selected ? legalChessMoves(g.board, g.selected[0], g.selected[1]) : [];
-  return `<div class="scene"><div class="notice wide">${escapeHtml(g.status || '')}</div><div class="boardbox"><div class="chess" style="grid-template-columns:repeat(8, 56px)">${g.board.flatMap((row,r)=>row.map((p,c)=>{ const dark=(r+c)%2===1; const sel=g.selected && g.selected[0]===r && g.selected[1]===c; const tgt=legal.some(m => m.r===r && m.c===c); return `<button class="cell ${dark ? 'dark' : 'light'} ${sel ? 'selected' : ''} ${tgt ? 'target' : ''}" data-action="chess-cell" data-r="${r}" data-c="${c}">${p ? `<span class="piece ${p.c}">${PIECES[p.c][p.t]}</span>` : ''}</button>`; })).join('')}</div></div><div class="footer-note">Selected pieces highlight legal moves. Castling and en passant are intentionally omitted for stability.</div></div>`;
+  const sd=g.turnSeat==='A'?'w':'b',opp=sd==='w'?'b':'w';
+  let any=false;for(let r=0;r<8&&!any;r++)for(let c=0;c<8&&!any;c++){const p=g.board[r][c];if(p&&p.c===sd&&legalMoves(g.board,r,c).length)any=true;}
+  const k=findKing(g.board,sd);const inChk=k?attacked(g.board,k[0],k[1],opp):false;
+  g.status=`${sd==='w'?'White':'Black'} to move${inChk?' &mdash; Check!':''}`;
+  if(!any){g.winner=inChk?(opp==='w'?'A':'B'):'D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=g.winner!=='D'?(g.winner==='A'?'B':'A'):'A';}
 }
 async function chessMove(r,c){
-  await refreshRoom().catch(()=>{});
-  const g = S.room.state;
-  if (g.gameOver || g.turnSeat !== S.me) return;
-  if (g.selected){
-    const [sr,sc] = g.selected;
-    const move = g.legal.find(m => m.r === r && m.c === c);
-    if (move){
-      g.board[r][c] = g.board[sr][sc]; g.board[sr][sc] = null;
-      if (g.board[r][c].t === 'p' && (r === 0 || r === 7)) g.board[r][c].t = 'q';
-      g.turnSeat = otherSeat(g.turnSeat);
-      g.selected = null; g.legal = [];
-      updateChessStatus(g);
-      S.room.state = g;
-      await saveRoomState().catch(()=>{});
-      render();
-      return;
+  const g=S.room.state;if(!g||g.gameOver)return;if(g.turnSeat!==S.me){setStatus('Not your turn',false);return;}
+  const mySide=S.me==='A'?'w':'b';
+  if(S.localSelect){
+    const[sr,sc]=S.localSelect;const mv=S.localLegal.find(m=>m.r===r&&m.c===c);
+    if(mv){
+      const nb=cloneBoard(g.board);nb[r][c]=nb[sr][sc];nb[sr][sc]=null;
+      if(nb[r][c].t==='p'&&(r===0||r===7))nb[r][c].t='q';
+      g.board=nb;g.turnSeat=otherSeat(g.turnSeat);S.localSelect=null;S.localLegal=[];
+      updateChessStatus(g);if(g.gameOver)setTimeout(showConfetti,200);
+      S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
+    const piece=g.board[r][c];
+    if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();return;}}
+    S.localSelect=null;S.localLegal=[];render();return;
   }
-  const p = g.board[r][c];
-  if (p && ((S.me === 'A' && p.c === 'w') || (S.me === 'B' && p.c === 'b'))){
-    g.selected = [r,c];
-    g.legal = legalChessMoves(g.board, r, c);
-    render();
-  }
+  const piece=g.board[r][c];
+  if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();}else setStatus('No legal moves for that piece',false);}
 }
-
-function renderBattleship(){
-  const g = S.room.state;
-  const me = S.me;
-  const my = me ? g.sides[me] : null;
-  const opp = otherSeat(me);
-  const phaseText = g.gameOver ? (g.winner === 'D' ? 'Draw.' : `${seatName(g.winner)} wins.`) : (g.phase === 'battle' ? `Battle phase — ${seatName(g.turnSeat)} to move` : `Placement phase — ${seatName(me)} placing ships`);
-  const boardHtml = g.phase === 'battle'
-    ? g.sides[opp].board
-    : my.board;
-  const board = boardHtml.flatMap((row,r)=>row.map((v,c)=>{
-    const state = g.phase === 'battle' ? g.sides[opp].shots[r][c] : (my.board[r][c] === 'S' ? '■' : '');
-    return `<button class="cell ${(r+c)%2===1 ? 'dark' : 'light'}" data-action="${g.phase === 'battle' ? 'battle-fire' : 'battle-place'}" data-r="${r}" data-c="${c}">${state || ''}</button>`;
+function renderChess(){
+  const g=S.room.state;
+  const cells=g.board.flatMap((row,r)=>row.map((p,c)=>{
+    const dark=(r+c)%2===1;const sel=S.localSelect&&S.localSelect[0]===r&&S.localSelect[1]===c;const tgt=S.localLegal.some(m=>m.r===r&&m.c===c);
+    return `<button class="cell ${dark?'dark':'light'}${sel?' selected':''}${tgt?' target':''}" data-action="ch-cell" data-r="${r}" data-c="${c}">${p?`<span class="piece ${p.c}">${PIECES[p.c][p.t]}</span>`:''}</button>`;
   })).join('');
-  const bank = g.phase === 'battle'
-    ? ''
-    : `<div class="toolbar">${g.shipSizes.map((sz,i)=>`<button class="btn good ${S.selectedShip===sz ? 'selected' : ''}" data-action="select-ship" data-size="${sz}" data-index="${i}">${sz} long</button>`).join('')}<button class="btn" data-action="battle-orient">Rotate: ${g.orient}</button></div>`;
-  return `<div class="scene"><div class="notice wide">${phaseText}${g.phase !== 'battle' ? ' • Tap a ship size, then tap the board to place it. Drag/drop is also supported on desktop.' : ''}</div>${bank}<div class="boardbox"><div class="battle" style="grid-template-columns:repeat(6, 56px)">${board}</div></div><div class="footer-note">Ships are placed on a fixed 6×6 board. You can rotate orientation before placing.</div></div>`;
-}
-function battleshipToggleOrient(){ S.room.state.orient = S.room.state.orient === 'H' ? 'V' : 'H'; render(); }
-function battleshipPlace(r,c){
-  const g = S.room.state; if (g.gameOver || g.turnSeat !== S.me || g.phase !== 'placeA' && g.phase !== 'placeB') return;
-  const sideKey = S.me;
-  const side = g.sides[sideKey];
-  const size = S.selectedShip || g.shipSizes[g.shipIndex];
-  const coords = [];
-  for (let i=0;i<size;i++){
-    const nr = r + (g.orient === 'V' ? i : 0);
-    const nc = c + (g.orient === 'H' ? i : 0);
-    if (!inside6(nr,nc)) return setStatus('Ship does not fit', false);
-    if (side.board[nr][nc]) return setStatus('Ships cannot overlap', false);
-    coords.push([nr,nc]);
-  }
-  coords.forEach(([nr,nc]) => side.board[nr][nc] = 'S');
-  side.ships.push(coords);
-  S.selectedShip = null;
-  g.shipIndex++;
-  if (g.shipIndex >= g.shipSizes.length){
-    side.placed = true;
-    g.shipIndex = 0;
-    if (S.me === 'A') { g.turnSeat = 'B'; g.phase = 'placeB'; }
-    else { g.turnSeat = 'A'; g.phase = 'battle'; }
-  }
-  S.room.state = g;
-  saveRoomState().then(()=>render()).catch(()=>{});
-}
-function battleshipFire(r,c){
-  const g = S.room.state; if (g.gameOver || g.phase !== 'battle' || g.turnSeat !== S.me) return;
-  const me = S.me; const opp = otherSeat(me); const target = g.sides[opp]; const shots = g.sides[me].shots;
-  if (shots[r][c]) return setStatus('Already fired there', false);
-  if (target.board[r][c] === 'S'){
-    shots[r][c] = 'H'; target.board[r][c] = 'X';
-    if (target.board.flat().every(v => v !== 'S')) { g.winner = me; g.gameOver = true; g.rematch = {A:false,B:false}; g.rematchStarter = otherSeat(me); }
-    else g.turnSeat = opp;
-    setStatus('Hit', false);
-  } else {
-    shots[r][c] = 'M'; g.turnSeat = opp; setStatus('Miss', false);
-  }
-  S.room.state = g;
-  saveRoomState().then(()=>render()).catch(()=>{});
+  return `<div class="scene"><div class="notice wide">${g.status||'White to move'}</div><div class="boardbox"><div class="chess" style="grid-template-columns:repeat(8,56px)">${cells}</div></div><div class="footer-note">Click a piece to select &nbsp;&bull;&nbsp; Green squares are legal moves &nbsp;&bull;&nbsp; Click again to deselect.</div></div>`;
 }
 
-function renderEndcard(){
-  const g = S.room.state;
-  const winnerSeat = g.winner;
-  const loserSeat = winnerSeat === 'A' ? 'B' : winnerSeat === 'B' ? 'A' : null;
-  const meResult = winnerSeat === 'D' ? 'draw' : (winnerSeat === S.me ? 'win' : 'loss');
-  return `<div class="overlay"><div class="box"><div class="kicker">Match finished</div><h3 style="margin:0 0 8px; font-size:1.5rem">${winnerSeat === 'D' ? 'Draw' : `${seatName(winnerSeat)} wins`}</h3><div class="muted small">${winnerSeat === 'D' ? 'No winner this round.' : `Winner: ${seatName(winnerSeat)} • Loser: ${seatName(loserSeat)} • Next round starts with the loser if both players vote yes.`}</div><div class="result-badges"><span class="result-badge ${meResult}">${winnerSeat === 'D' ? 'Draw' : (meResult === 'win' ? 'You won' : 'You lost')}</span><span class="result-badge ${g.rematch?.A ? 'win' : ''}">Player A vote: ${g.rematch?.A ? 'Yes' : 'No'}</span><span class="result-badge ${g.rematch?.B ? 'win' : ''}">Player B vote: ${g.rematch?.B ? 'Yes' : 'No'}</span></div><div class="hr"></div><div class="toolbar"><button class="btn good" data-action="vote-rematch">Vote to replay</button><button class="btn warn" data-action="clear-rematch">Clear my vote</button></div><div class="soft" style="margin-top:10px">${g.rematch?.A && g.rematch?.B ? `Both players voted. A new round will start now with ${seatName(g.rematchStarter)} going first.` : 'The room stays here until both players vote or the room goes inactive.'}</div></div></div>`;
+/* ════════════════════════════════════════════════════════
+   BATTLESHIP  (fixed: local orient, lock phase, correct shot display)
+════════════════════════════════════════════════════════ */
+function clearBattlePrev(){document.querySelectorAll('.cell.ship-preview,.cell.ship-preview-invalid').forEach(el=>el.classList.remove('ship-preview','ship-preview-invalid'));}
+function updateBattlePrev(cell){
+  clearBattlePrev();if(!cell||!S.room?.state)return;
+  const g=S.room.state;const myPhase=S.me==='A'?'placeA':'placeB';
+  if(g.phase!==myPhase||S.battleAwaitingLock)return;
+  const my=g.sides[S.me];const sz=g.shipSizes[g.shipIndex];if(!sz)return;
+  const r=+cell.dataset.r,c_=+cell.dataset.c;
+  let valid=true;const coords=[];
+  for(let i=0;i<sz;i++){const nr=r+(S.battleOrient==='V'?i:0),nc=c_+(S.battleOrient==='H'?i:0);if(!inside6(nr,nc)||my.board[nr][nc])valid=false;coords.push([nr,nc]);}
+  coords.forEach(([nr,nc])=>{const el=document.querySelector(`[data-action="bt-place"][data-r="${nr}"][data-c="${nc}"]`);if(el)el.classList.add(valid?'ship-preview':'ship-preview-invalid');});
 }
-function resetForRematch(){ const starter = S.room.state.rematchStarter || 'A'; S.room.state = roomState(S.room.game, starter); S.room.state.rematch = {A:false, B:false}; S.room.state.rematchStarter = otherSeat(starter); }
+function battlePlace(r,c){
+  const g=S.room.state;const myPhase=S.me==='A'?'placeA':'placeB';
+  if(!g||g.gameOver||g.phase!==myPhase||S.battleAwaitingLock)return;
+  const my=g.sides[S.me];const sz=g.shipSizes[g.shipIndex];if(!sz)return;
+  const coords=[];
+  for(let i=0;i<sz;i++){const nr=r+(S.battleOrient==='V'?i:0),nc=c+(S.battleOrient==='H'?i:0);if(!inside6(nr,nc))return setStatus('Ship does not fit here',false);if(my.board[nr][nc])return setStatus('Ships cannot overlap',false);coords.push([nr,nc]);}
+  coords.forEach(([nr,nc])=>my.board[nr][nc]='S');my.ships.push(coords);g.shipIndex++;
+  if(g.shipIndex>=g.shipSizes.length){my.placed=true;g.shipIndex=0;S.battleAwaitingLock=true;}
+  S.room.state=g;render();
+}
+async function battleLock(){
+  const g=S.room.state;S.battleAwaitingLock=false;
+  if(S.me==='A'){g.turnSeat='B';g.phase='placeB';}else{g.turnSeat='A';g.phase='battle';}
+  S.room.state=g;await saveRoomState().catch(()=>{});render();
+}
+function battleReset(){
+  const g=S.room.state;if(!g)return;const my=g.sides[S.me];
+  my.board=Array.from({length:6},()=>Array(6).fill(''));my.ships=[];my.placed=false;
+  g.shipIndex=0;S.battleAwaitingLock=false;S.room.state=g;render();
+}
+function battleFire(r,c){
+  const g=S.room.state;if(!g||g.gameOver||g.phase!=='battle'||g.turnSeat!==S.me)return;
+  const me=S.me,opp=otherSeat(me);const oppSide=g.sides[opp];const myShots=g.sides[me].shots;
+  if(myShots[r][c])return setStatus('Already fired there',false);
+  if(oppSide.board[r][c]==='S'){myShots[r][c]='H';oppSide.board[r][c]='X';if(oppSide.board.flat().every(v=>v!=='S')){g.winner=me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(me);setTimeout(showConfetti,200);}else g.turnSeat=opp;setStatus('&#128293; Hit!',false);}
+  else{myShots[r][c]='M';g.turnSeat=opp;setStatus('Miss &middot;',false);}
+  S.room.state=g;saveRoomState().then(()=>render()).catch(()=>{});
+}
+function renderBattleship(){
+  const g=S.room.state;if(!S.me||!g)return `<div class="soft">Loading&#8230;</div>`;
+  const me=S.me,opp=otherSeat(me);const my=g.sides[me];const myPlacePhase=me==='A'?'placeA':'placeB';const sz='56px';
 
+  /* ── Battle ── */
+  if(g.phase==='battle'){
+    const isMyTurn=g.turnSeat===me;
+    const fireGrid=Array.from({length:6},(_,r)=>Array.from({length:6},(_,c_)=>{
+      const shot=g.sides[me].shots[r][c_];const cls=`cell ${(r+c_)%2===1?'dark':'light'}${shot==='H'?' hit-marker':''}${shot==='M'?' miss-marker':''}`;
+      const con=shot==='H'?'<span style="color:#ff7b93;font-size:1.2rem;font-weight:900">&#10005;</span>':shot==='M'?'<span style="color:#8899cc;font-size:1.4rem;line-height:1">&middot;</span>':'';
+      const canFire=isMyTurn&&!g.gameOver&&!shot;
+      return `<button class="${cls}" style="width:${sz};height:${sz}" ${canFire?`data-action="bt-fire" data-r="${r}" data-c="${c_}"`:'disabled'}>${con}</button>`;
+    }).join('')).join('');
+    const myGrid=my.board.flatMap((row,r)=>row.map((v,c_)=>{
+      const os=g.sides[opp].shots[r][c_];const cls=`cell ${(r+c_)%2===1?'dark':'light'}${v==='S'||v==='X'?' has-ship':''}${os==='H'?' hit-marker':''}`;
+      return `<div class="${cls}" style="width:42px;height:42px">${os==='H'?'&#128293;':v==='X'?'&#128293;':v==='S'?'<span style="opacity:.55;font-size:.75rem">&#9632;</span>':''}</div>`;
+    })).join('');
+    return `<div class="scene"><div class="notice wide">${g.gameOver?(g.winner==='D'?'Draw.':`${seatName(g.winner)} wins! &#127881;`):(isMyTurn?'&#127919; Your turn &mdash; pick a target!':'&#8987; Waiting for opponent&#8230;')}</div><div style="display:flex;flex-wrap:wrap;gap:20px;justify-content:center;width:100%"><div style="text-align:center"><div class="muted small" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Enemy Waters</div><div class="boardbox"><div class="battle" style="grid-template-columns:repeat(6,${sz})">${fireGrid}</div></div></div><div style="text-align:center"><div class="muted small" style="margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Your Fleet</div><div class="boardbox"><div class="battle" style="grid-template-columns:repeat(6,42px)">${myGrid}</div></div></div></div><div class="footer-note">&#10005; = Hit &nbsp;&middot;&nbsp; &middot; = Miss &nbsp;&middot;&nbsp; Sink all 3 enemy ships to win!</div></div>`;
+  }
+
+  /* ── Awaiting lock ── */
+  if(S.battleAwaitingLock&&g.phase===myPlacePhase){
+    const prev=my.board.flatMap((row,r)=>row.map((v,c_)=>`<div class="cell ${(r+c_)%2===1?'dark':'light'}${v==='S'?' has-ship':''}" style="width:${sz};height:${sz}">${v==='S'?'&#9632;':''}</div>`)).join('');
+    return `<div class="scene" style="text-align:center"><div class="notice wide" style="margin-bottom:14px">&#9989; All ships placed! Review your fleet, then lock in.</div><div class="boardbox" style="margin:0 auto 16px"><div class="battle" style="grid-template-columns:repeat(6,${sz})">${prev}</div></div><div class="toolbar" style="justify-content:center;gap:14px"><button class="btn primary" data-action="bt-lock">&#128274; Lock In Ships!</button><button class="btn danger" data-action="bt-reset">&#8617; Redo Placement</button></div><div class="footer-note">Once locked your ships cannot be moved.</div></div>`;
+  }
+
+  /* ── Waiting for other player ── */
+  if(g.phase!==myPlacePhase){return `<div class="scene"><div class="soft">&#8987; Waiting for ${seatName(opp)} to place their ships&#8230;</div></div>`;}
+
+  /* ── Placement ── */
+  const curSz=g.shipSizes[g.shipIndex];
+  const shipInfo=g.shipSizes.map((s,i)=>`<span class="badge${i===g.shipIndex?' multi':' solo'}" style="opacity:${i<g.shipIndex?.4:1}">${i<g.shipIndex?'&#10003;':i===g.shipIndex?'&#8594;':''} ${s}-unit</span>`).join('');
+  const boardCells=my.board.flatMap((row,r)=>row.map((v,c_)=>`<button class="cell ${(r+c_)%2===1?'dark':'light'}${v==='S'?' has-ship':''}" data-action="bt-place" data-r="${r}" data-c="${c_}" style="width:${sz};height:${sz}">${v==='S'?'&#9632;':''}</button>`)).join('');
+  return `<div class="scene"><div class="notice wide">Placing ${curSz}-unit ship (${g.shipSizes.length-g.shipIndex} remaining)</div><div class="toolbar">${shipInfo}<button class="btn" data-action="bt-orient">&#8635; ${S.battleOrient==='H'?'Horizontal':'Vertical'}</button></div><div class="boardbox"><div class="battle" style="grid-template-columns:repeat(6,${sz})">${boardCells}</div></div><div class="footer-note">Tap a cell to place &nbsp;&bull;&nbsp; Tap Rotate to change direction &nbsp;&bull;&nbsp; Ships shown as &#9632;</div></div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   ENDCARD & REMATCH
+════════════════════════════════════════════════════════ */
+function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);resetLocalState();}
 async function voteRematch(vote){
-  if (!S.room || !S.me) return;
-  const g = S.room.state;
-  if (!g.gameOver) return;
-  g.rematch[S.me] = vote;
-  S.room.state = g;
-  await saveRoomState().catch(()=>{});
-  if (g.rematch.A && g.rematch.B){
-    resetForRematch();
-    await saveRoomState().catch(()=>{});
-    await refreshRoom().catch(()=>{});
-  }
+  if(!S.room||!S.me)return;const g=S.room.state;if(!g.gameOver)return;
+  g.rematch[S.me]=vote;S.room.state=g;await saveRoomState().catch(()=>{});
+  if(g.rematch.A&&g.rematch.B){resetForRematch();await saveRoomState().catch(()=>{});await refreshRoom().catch(()=>{});}
   render();
 }
-
-function render(){
-  homeBtn.style.display = S.screen === 'home' ? 'none' : 'inline-flex';
-  app.innerHTML = S.screen === 'home' ? renderHome() : (S.screen === 'solo' ? renderSolo() : renderRoom());
-  renderSync();
+function renderEndcard(){
+  const g=S.room.state;const w=g.winner;const me=S.me;
+  const res=w==='D'?'draw':(w===me?'win':'loss');
+  const title=w==='D'?'Draw &#9996;&#65039;':`${seatName(w)} wins! &#127942;`;
+  const detail=w==='D'?'No winner this round.':`Next round starts with ${seatName(g.rematchStarter||otherSeat(w||'A'))}.`;
+  const both=g.rematch?.A&&g.rematch?.B;
+  return `<div class="overlay"><div class="box"><div class="kicker">Match finished</div><h3 style="margin:0 0 8px;font-size:1.5rem">${title}</h3><div class="muted small">${detail}</div><div class="result-badges"><span class="result-badge ${res}">${w==='D'?'Draw':(res==='win'?'You won! &#127881;':'You lost')}</span><span class="result-badge${g.rematch?.A?' win':''}">A: ${g.rematch?.A?'Ready':'&mdash;'}</span><span class="result-badge${g.rematch?.B?' win':''}">B: ${g.rematch?.B?'Ready':'&mdash;'}</span></div><div class="hr"></div><div class="toolbar"><button class="btn good" data-action="vote-rematch">&#9654; Play again</button><button class="btn" data-action="clear-rematch">&#10005; Clear vote</button></div><div class="soft" style="margin-top:10px">${both?'Both ready! Starting new round&#8230;':'Waiting for both players to vote.'}</div></div></div>`;
 }
+
+/* ════════════════════════════════════════════════════════
+   LAYOUT HELPERS
+════════════════════════════════════════════════════════ */
+function card(kind,title,desc,btn,action){return `<div class="card"><div class="badge ${kind==='Solo'?'solo':'multi'}">${kind}</div><h3>${title}</h3><p>${desc}</p><div class="row"><button class="btn primary" data-action="${action}">${btn}</button></div></div>`;}
+function syncBar(){return `<div class="syncbar"><div id="sync" class="sync-left"><span style="width:16px;height:16px;display:inline-block"></span><span>${esc(syncText())}</span></div><div class="muted small">${S.room?`Room ${esc(S.room.roomId)}`:'Local only'}</div></div>`;}
+function sidePanel(){
+  const seat=S.room?seatName(S.me):'None';const turn=S.room?.state?.turnSeat?seatName(S.room.state.turnSeat):'&mdash;';
+  return `<div class="side"><div class="cardish"><div class="section-title">Room</div><div class="room-status" style="margin-bottom:8px">${S.room?`<span class="seat good">${seat}</span><span class="seat">Turn: ${turn}</span>`:'<span class="seat warn">No room</span>'}</div><input class="room-link" value="${esc(shareUrl())}" readonly onclick="this.select()" /><div class="toolbar" style="margin-top:10px"><button class="btn good" data-action="copy-link">Copy link</button><button class="btn" data-action="do-refresh">&#8635; Refresh</button></div></div><div class="cardish"><div class="section-title">Status</div><div class="muted small" id="statusBox">${esc(statusEl.textContent)}</div></div></div>`;
+}
+
+/* ════════════════════════════════════════════════════════
+   PAGE RENDERS
+════════════════════════════════════════════════════════ */
 function renderHome(){
-  return `<div class="shell"><div class="stage">
-    <div class="hero"><div class="hero-inner">
-      <div class="kicker">Free static front end + shared room backend</div>
-      <h2>One platform for solo puzzles and live turn-based rooms.</h2>
-      <p>Solo games run in the browser. Multiplayer rooms use a free shared backend so the board syncs automatically, turns are enforced, and nobody has to keep sending a fresh link after every move.</p>
-      <div class="toolbar" style="margin-top:16px"><button class="btn primary" data-action="resume-room">Resume room</button><button class="btn" data-action="reset-local">Reset local solo progress</button></div>
-      <div class="hr"></div>
-      <div class="notice">For multiplayer, deploy the Apps Script backend, paste its web app URL into CONFIG.backendUrl, then host this file on GitHub Pages.</div>
-    </div></div>
-    <div class="panel"><div class="panel-h"><div><div class="section-title">Game library</div><div class="muted small">Pick a solo puzzle or start a shared room</div></div></div>
-      <div class="panel-b"><div class="cards">
-        ${card('Solo','Sudoku','Choose easy, medium, or hard and fill the grid.','Start','solo-sudoku')}
-        ${card('Solo','Wordle','6 guesses with difficulty-based word pools.','Start','solo-wordle')}
-        ${card('Solo','Mini Crossword','Compact crossword-style board with clues.','Start','solo-crossword')}
-        ${card('Multiplayer','Tic-Tac-Toe','Fast room play with enforced turns.','Create room','multi-ttt')}
-        ${card('Multiplayer','Connect Four','Red and yellow chips, live sync.','Create room','multi-connect4')}
-        ${card('Multiplayer','Checkers','Turn-based board with captures.','Create room','multi-checkers')}
-        ${card('Multiplayer','Chess','Legal moves, highlights, and promotion.','Create room','multi-chess')}
-        ${card('Multiplayer','Battleship','Place ships, then fire in battle mode.','Create room','multi-battleship')}
-      </div></div></div>
-  </div></div>`;
+  return `<div class="shell"><div class="stage"><div class="hero"><div class="hero-inner"><div class="kicker">Solo puzzles + live multiplayer rooms</div><h2>One hub for classic games, free forever.</h2><p>Solo games run entirely in your browser. Multiplayer rooms sync automatically over a shared backend &mdash; share the link and play from anywhere.</p><div class="toolbar" style="margin-top:16px"><button class="btn primary" data-action="resume-room">Resume room</button><button class="btn warn" data-action="reset-local">Reset solo progress</button></div><div class="hr"></div><div class="notice">Deploy the Apps Script backend, paste its URL into CONFIG.backendUrl, then host this file on GitHub Pages.</div></div></div><div class="panel"><div class="panel-h"><div><div class="section-title">Game Library</div><div class="muted small">Pick a solo puzzle or start a live multiplayer room</div></div></div><div class="panel-b"><div class="cards">${card('Solo','Sudoku','Easy, medium, or hard &mdash; fill the 9&times;9 grid with no repeats.','Start','solo-sudoku')}${card('Solo','Wordle','Guess the 5-letter word in 6 tries. A&ndash;Z keyboard layout.','Start','solo-wordle')}${card('Solo','Mini Crossword','Compact across/down crossword board.','Start','solo-crossword')}${card('Solo','2048','Slide tiles to merge them &mdash; reach the legendary 2048!','Start','solo-twenty48')}${card('Solo','Minesweeper','Clear the minefield without triggering a single mine.','Start','solo-minesweeper')}${card('Multiplayer','Tic-Tac-Toe','Classic 3-in-a-row. Share the link, play live.','Create room','multi-ttt')}${card('Multiplayer','Connect Four','Drop chips to line up 4 in a row.','Create room','multi-connect4')}${card('Multiplayer','Checkers','Turn-based captures on an 8&times;8 board.','Create room','multi-checkers')}${card('Multiplayer','Chess','Full legal moves, check detection, pawn promotion.','Create room','multi-chess')}${card('Multiplayer','Battleship','Place ships &#8594; lock in &#8594; fire at the enemy grid!','Create room','multi-battleship')}</div></div></div></div></div>`;
 }
 function renderSolo(){
-  const g = S.game;
-  const head = `<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Free browser game, no server required</div></div><div class="toolbar">${g==='sudoku' ? `<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select><button id="notesToggle" class="btn ${S.notesMode ? 'notes-mode' : ''}">${S.notesMode ? 'Notes: On' : 'Notes: Off'}</button>` : ''}${g==='wordle' ? `<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select>` : ''}${g==='crossword' ? `<select id="crosswordPick" class="select">${CROSSWORDS.map((c,i)=>`<option value="${i}" ${i===0?'selected':''}>${c.name}</option>`).join('')}</select>` : ''}<button class="btn warn" data-action="new-solo">New</button></div></div>`;
-  const body = g==='sudoku' ? renderSudoku() : g==='wordle' ? renderWordle() : renderCrossword();
-  return `<div class="shell"><div class="stage"><div class="layout"><div class="main">${head}<div class="body scene-wrap"><div class="scene">${syncBar()}${body}</div></div></div>${sidePanel()}</div></div></div>`;
+  const g=S.game;let tb='';
+  if(g==='sudoku')tb=`<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select><button class="btn${S.notesMode?' notes-mode':''}" data-action="toggle-notes">${S.notesMode?'&#9998; Notes ON':'Notes OFF'}</button>`;
+  if(g==='wordle')tb=`<select id="soloDiff" class="select"><option>easy</option><option selected>medium</option><option>hard</option></select>`;
+  if(g==='crossword')tb=`<select id="cwPick" class="select">${CROSSWORDS.map((x,i)=>`<option value="${i}">${x.name}</option>`).join('')}</select>`;
+  if(g==='minesweeper')tb=`<select id="mineDiff" class="select"><option value="easy">Easy 9&times;9</option><option value="medium">Medium 16&times;9</option><option value="hard">Hard 16&times;16</option></select>`;
+  tb+=`<button class="btn warn" data-action="new-solo">New Game</button>`;
+  let body='';
+  if(g==='sudoku')body=renderSudoku();else if(g==='wordle')body=renderWordle();else if(g==='crossword')body=renderCrossword();else if(g==='twenty48')body=render2048();else if(g==='minesweeper')body=renderMinesweeper();
+  return `<div class="shell"><div class="stage"><div class="layout"><div class="main"><div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Solo &mdash; no server required</div></div><div class="toolbar">${tb}</div></div><div class="body scene-wrap">${body}</div></div>${sidePanel()}</div></div></div>`;
 }
 function renderRoom(){
-  const g = S.game;
-  const head = `<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Live room: <strong>${S.room ? S.room.roomId : '...'}</strong></div></div><div class="toolbar"><button class="btn good" data-action="copy-link">Copy room link</button><button class="btn warn" data-action="new-room">New room</button></div></div>`;
-  const body = !S.room ? `<div class="soft">Joining room…</div>` : g==='ttt' ? renderTTT() : g==='connect4' ? renderConnect4() : g==='checkers' ? renderCheckers() : g==='chess' ? renderChess() : renderBattleship();
-  const overlay = S.room && S.room.state?.gameOver ? renderEndcard() : '';
+  const g=S.game;
+  const head=`<div class="head"><div><h2>${gameLabel(g)}</h2><div class="sub">Live room: <strong>${S.room?.roomId||'...'}</strong></div></div><div class="toolbar"><button class="btn good" data-action="copy-link">Copy link</button><button class="btn warn" data-action="new-room">New room</button></div></div>`;
+  const body=!S.room?`<div class="soft">Joining room&#8230;</div>`:g==='ttt'?renderTTT():g==='connect4'?renderConnect4():g==='checkers'?renderCheckers():g==='chess'?renderChess():renderBattleship();
+  const overlay=S.room?.state?.gameOver?renderEndcard():'';
   return `<div class="shell"><div class="stage"><div class="layout"><div class="main" style="position:relative">${overlay}${head}<div class="body scene-wrap"><div class="scene">${syncBar()}${body}</div></div></div>${sidePanel()}</div></div></div>`;
 }
-
-function handleAction(action, el){
-  if (action === 'home') return goHome();
-  if (action === 'reset-all') return resetLocal();
-  if (action === 'copy-link') return copy(updateUrlValue());
-  if (action === 'resume-room'){ const roomId = qs('room'); const game = qs('game'); if (roomId && game){ S.screen='room'; S.game=game; render(); joinRoom(roomId).catch(err => setStatus(err.message, false)); } return; }
-  if (action === 'refresh-room') return refreshRoom().catch(err => setStatus(err.message, false));
-  if (action === 'solo-sudoku') return openSolo('sudoku');
-  if (action === 'solo-wordle') return openSolo('wordle');
-  if (action === 'solo-crossword') return openSolo('crossword');
-  if (action === 'multi-ttt') return openMulti('ttt');
-  if (action === 'multi-connect4') return openMulti('connect4');
-  if (action === 'multi-checkers') return openMulti('checkers');
-  if (action === 'multi-chess') return openMulti('chess');
-  if (action === 'multi-battleship') return openMulti('battleship');
-  if (action === 'new-room') return openMulti(S.game);
-  if (action === 'new-solo'){ const diff = document.getElementById('soloDiff')?.value || 'medium'; if (S.game === 'sudoku') initSudoku(diff); if (S.game === 'wordle') initWordle(diff); if (S.game === 'crossword') initCrossword(Number(document.getElementById('crosswordPick')?.value || 0)); render(); return; }
-  if (action === 'toggle-notes'){ S.notesMode = !S.notesMode; render(); return; }
-  if (action === 'vote-rematch') return voteRematch(true);
-  if (action === 'clear-rematch') return voteRematch(false);
-  if (action === 'sudoku-cell'){ S.solo.sudoku.selected = [Number(el.dataset.r), Number(el.dataset.c)]; render(); return; }
-  if (action === 'sudoku-num'){ sudokuSet(...S.solo.sudoku.selected, el.dataset.n); return; }
-  if (action === 'sudoku-clear'){ sudokuSet(...S.solo.sudoku.selected, ''); return; }
-  if (action === 'wordle-key') return wordleKey(el.dataset.ch);
-  if (action === 'wordle-back') return wordleBack();
-  if (action === 'wordle-enter') return wordleEnter();
-  if (action === 'ttt-move') return tttMove(Number(el.dataset.i));
-  if (action === 'connect-move') return connectMove(Number(el.dataset.col));
-  if (action === 'checkers-cell') return checkersMove(Number(el.dataset.r), Number(el.dataset.c));
-  if (action === 'chess-cell') return chessMove(Number(el.dataset.r), Number(el.dataset.c));
-  if (action === 'battle-orient') { S.room.state.orient = S.room.state.orient === 'H' ? 'V' : 'H'; render(); return; }
-  if (action === 'battle-place') return battleshipPlace(Number(el.dataset.r), Number(el.dataset.c));
-  if (action === 'battle-fire') return battleshipFire(Number(el.dataset.r), Number(el.dataset.c));
-  if (action === 'select-ship') { S.selectedShip = Number(el.dataset.size); render(); return; }
+function render(){
+  homeBtn.style.display=S.screen==='home'?'none':'inline-flex';
+  app.innerHTML=S.screen==='home'?renderHome():S.screen==='solo'?renderSolo():renderRoom();
+  renderSync();
 }
-document.addEventListener('click', e => { const el = e.target.closest('[data-action]'); if (!el) return; handleAction(el.dataset.action, el); });
-document.addEventListener('change', e => {
-  const el = e.target;
-  if (el.id === 'soloDiff' && S.screen === 'solo' && S.game === 'sudoku') { initSudoku(el.value); render(); }
-  if (el.id === 'soloDiff' && S.screen === 'solo' && S.game === 'wordle') { initWordle(el.value); render(); }
-  if (el.id === 'crosswordPick') { initCrossword(Number(el.value)); render(); }
-  if (el.matches('input[data-action="crossword-cell"]')) crosswordSet(Number(el.dataset.r), Number(el.dataset.c), el.value);
-});
-document.addEventListener('input', e => {
-  const el = e.target;
-  if (el.matches('input[data-action="crossword-cell"]')) crosswordSet(Number(el.dataset.r), Number(el.dataset.c), el.value);
-  if (el.matches('input[data-r][data-c]') && S.screen === 'solo' && S.game === 'sudoku'){
-    const r = Number(el.dataset.r), c = Number(el.dataset.c);
-    const v = el.value.replace(/[^1-9]/g,'').slice(0,1);
-    sudokuSet(r,c,v);
-  }
-});
-document.addEventListener('keydown', e => {
-  if (S.screen === 'solo' && S.game === 'sudoku'){
-    if (/^[1-9]$/.test(e.key)) { e.preventDefault(); sudokuSet(...S.solo.sudoku.selected, e.key); return; }
-    if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); sudokuSet(...S.solo.sudoku.selected, ''); return; }
-    if (e.key === 'ArrowUp') { e.preventDefault(); sudokuMove('up'); return; }
-    if (e.key === 'ArrowDown') { e.preventDefault(); sudokuMove('down'); return; }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); sudokuMove('left'); return; }
-    if (e.key === 'ArrowRight') { e.preventDefault(); sudokuMove('right'); return; }
-    if (e.key.toLowerCase() === 'n') { e.preventDefault(); S.notesMode = !S.notesMode; render(); return; }
-  }
-  if (S.screen === 'solo' && S.game === 'wordle'){
-    if (/^[a-zA-Z]$/.test(e.key)) { e.preventDefault(); wordleKey(e.key.toUpperCase()); return; }
-    if (e.key === 'Backspace') { e.preventDefault(); wordleBack(); return; }
-    if (e.key === 'Enter') { e.preventDefault(); wordleEnter(); return; }
-  }
-});
-homeBtn.addEventListener('click', goHome);
 
-function restoreFromUrl(){
-  const roomId = qs('room'); const game = qs('game');
-  if (roomId && game){ S.screen='room'; S.game=game; render(); joinRoom(roomId).catch(err => setStatus(err.message, false)); }
+/* ════════════════════════════════════════════════════════
+   ACTION DISPATCHER
+════════════════════════════════════════════════════════ */
+function handleAction(action,el){
+  if(action==='home')return goHome();
+  if(action==='reset-local'){S.solo={sudoku:null,wordle:null,crossword:null,twenty48:null,minesweeper:null};setStatus('Progress reset',false);render();return;}
+  if(action==='copy-link')return navigator.clipboard.writeText(shareUrl()).then(()=>setStatus('Link copied!',false)).catch(()=>setStatus('Copy failed',false));
+  if(action==='do-refresh')return refreshRoom().catch(e=>setStatus(e.message,false));
+  if(action==='resume-room'){const rid=qs('room'),gm=qs('game');if(rid&&gm){S.screen='room';S.game=gm;render();joinRoom(rid).catch(e=>setStatus(e.message,false));}return;}
+  if(action==='solo-sudoku')return openSolo('sudoku');
+  if(action==='solo-wordle')return openSolo('wordle');
+  if(action==='solo-crossword')return openSolo('crossword');
+  if(action==='solo-twenty48')return openSolo('twenty48');
+  if(action==='solo-minesweeper')return openSolo('minesweeper');
+  if(action==='multi-ttt')return openMulti('ttt');
+  if(action==='multi-connect4')return openMulti('connect4');
+  if(action==='multi-checkers')return openMulti('checkers');
+  if(action==='multi-chess')return openMulti('chess');
+  if(action==='multi-battleship')return openMulti('battleship');
+  if(action==='new-room')return openMulti(S.game);
+  if(action==='new-solo'){
+    const diff=document.getElementById('soloDiff')?.value||'medium';
+    const mDiff=document.getElementById('mineDiff')?.value||'easy';
+    if(S.game==='sudoku')initSudoku(diff);else if(S.game==='wordle')initWordle(diff);else if(S.game==='crossword')initCrossword(+(document.getElementById('cwPick')?.value||0));else if(S.game==='twenty48')init2048();else if(S.game==='minesweeper')initMinesweeper(mDiff);
+    render();return;
+  }
+  if(action==='toggle-notes'){S.notesMode=!S.notesMode;render();return;}
+  if(action==='vote-rematch')return voteRematch(true);
+  if(action==='clear-rematch')return voteRematch(false);
+  if(action==='sudoku-sel'){S.solo.sudoku.sel=[+el.dataset.r,+el.dataset.c];render();return;}
+  if(action==='sudoku-num')return sudokuSet(...S.solo.sudoku.sel,el.dataset.n);
+  if(action==='sudoku-clr')return sudokuSet(...S.solo.sudoku.sel,'');
+  if(action==='wkey')return wKey(el.dataset.ch);
+  if(action==='wback')return wBack();
+  if(action==='wenter')return wEnter();
+  if(action==='ttt-move')return tttMove(+el.dataset.i);
+  if(action==='c4-move')return connectMove(+el.dataset.col);
+  if(action==='ck-cell')return checkersMove(+el.dataset.r,+el.dataset.c);
+  if(action==='ch-cell')return chessMove(+el.dataset.r,+el.dataset.c);
+  if(action==='bt-orient'){S.battleOrient=S.battleOrient==='H'?'V':'H';clearBattlePrev();render();return;}
+  if(action==='bt-place')return battlePlace(+el.dataset.r,+el.dataset.c);
+  if(action==='bt-fire')return battleFire(+el.dataset.r,+el.dataset.c);
+  if(action==='bt-lock')return battleLock();
+  if(action==='bt-reset')return battleReset();
+  if(action==='mine-reveal')return mineReveal(+el.dataset.r,+el.dataset.c);
+  if(action==='mine-flag-toggle'){S.solo.minesweeper.flagMode=!S.solo.minesweeper.flagMode;render();return;}
+  if(action==='t48-continue'){S.solo.twenty48.continued=true;render();return;}
 }
-async function boot(){ restoreFromUrl(); if (!qs('room')) { S.screen='home'; render(); } startPolling(); updateUrl(); render(); }
+
+/* ════════════════════════════════════════════════════════
+   EVENT LISTENERS
+════════════════════════════════════════════════════════ */
+document.addEventListener('click',e=>{const el=e.target.closest('[data-action]');if(el)handleAction(el.dataset.action,el);});
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='soloDiff'&&S.screen==='solo'){if(S.game==='sudoku')initSudoku(el.value);if(S.game==='wordle')initWordle(el.value);render();return;}
+  if(el.id==='cwPick'){initCrossword(+el.value);render();return;}
+  if(el.id==='mineDiff'){initMinesweeper(el.value);render();return;}
+  if(el.matches('[data-action="cw-cell"]'))cwSet(+el.dataset.r,+el.dataset.c,el.value);
+});
+document.addEventListener('input',e=>{if(e.target.matches('[data-action="cw-cell"]'))cwSet(+e.target.dataset.r,+e.target.dataset.c,e.target.value);});
+document.addEventListener('keydown',e=>{
+  if(S.screen==='solo'&&S.game==='sudoku'){
+    if(/^[1-9]$/.test(e.key)){e.preventDefault();sudokuSet(...S.solo.sudoku.sel,e.key);}
+    else if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();sudokuSet(...S.solo.sudoku.sel,'');}
+    else if(e.key==='ArrowUp'){e.preventDefault();sudokuMove('up');}
+    else if(e.key==='ArrowDown'){e.preventDefault();sudokuMove('down');}
+    else if(e.key==='ArrowLeft'){e.preventDefault();sudokuMove('left');}
+    else if(e.key==='ArrowRight'){e.preventDefault();sudokuMove('right');}
+    else if(e.key.toLowerCase()==='n'){e.preventDefault();S.notesMode=!S.notesMode;render();}
+    return;
+  }
+  if(S.screen==='solo'&&S.game==='wordle'){
+    if(/^[a-zA-Z]$/.test(e.key)){e.preventDefault();wKey(e.key.toUpperCase());}
+    else if(e.key==='Backspace'){e.preventDefault();wBack();}
+    else if(e.key==='Enter'){e.preventDefault();wEnter();}
+    return;
+  }
+  if(S.screen==='solo'&&S.game==='twenty48'){
+    const dirs={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down'};
+    if(dirs[e.key]){e.preventDefault();move2048(dirs[e.key]);}
+  }
+});
+
+/* swipe for 2048 + long-press flag for minesweeper */
+let tx=0,ty=0,lpTimer=null,lpTgt=null;
+document.addEventListener('touchstart',e=>{
+  tx=e.touches[0].clientX;ty=e.touches[0].clientY;
+  if(S.screen==='solo'&&S.game==='minesweeper'){const cell=e.target.closest('[data-action="mine-reveal"]');if(cell){lpTgt=cell;lpTimer=setTimeout(()=>{if(lpTgt){mineFlag(+lpTgt.dataset.r,+lpTgt.dataset.c);lpTgt=null;}},500);}}
+},{passive:true});
+document.addEventListener('touchend',e=>{
+  clearTimeout(lpTimer);lpTimer=null;lpTgt=null;
+  if(S.screen==='solo'&&S.game==='twenty48'){const dx=e.changedTouches[0].clientX-tx,dy=e.changedTouches[0].clientY-ty;if(Math.max(Math.abs(dx),Math.abs(dy))>=30){if(Math.abs(dx)>Math.abs(dy))move2048(dx>0?'right':'left');else move2048(dy>0?'down':'up');}}
+},{passive:true});
+document.addEventListener('touchmove',()=>{clearTimeout(lpTimer);lpTimer=null;lpTgt=null;},{passive:true});
+
+/* battleship hover preview */
+document.addEventListener('mouseover',e=>{if(S.screen==='room'&&S.game==='battleship'){const cell=e.target.closest('[data-action="bt-place"]');updateBattlePrev(cell||null);}});
+document.addEventListener('mouseleave',()=>clearBattlePrev(),true);
+
+homeBtn.addEventListener('click',goHome);
+
+/* ════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════ */
+function boot(){
+  const rid=qs('room'),gm=qs('game');
+  if(rid&&gm){S.screen='room';S.game=gm;render();joinRoom(rid).catch(e=>setStatus(e.message,false));}
+  else{S.screen='home';render();}
+  startPolling();
+}
 boot();
-
-window.addEventListener('visibilitychange', () => { if (!document.hidden && S.room) refreshRoom().catch(()=>{}); });
+window.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.room)refreshRoom().catch(()=>{});});
 </script>
 </body>
 </html>
