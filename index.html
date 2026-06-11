@@ -23,6 +23,8 @@
     @keyframes mineExplode{0%,100%{transform:scale(1)}35%{transform:scale(1.4)}}
     @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(120vh) rotate(720deg);opacity:0}}
     @keyframes winPulse{0%,100%{box-shadow:var(--shadow2)}50%{box-shadow:0 0 40px rgba(119,226,183,.45)}}
+    @keyframes forceRing{0%,100%{box-shadow:0 0 0 2px rgba(255,209,102,.4)}50%{box-shadow:0 0 0 4px rgba(255,209,102,.9)}}
+    .cell.force-capture .piece{animation:forceRing .75s ease infinite;border-radius:50%;}
     .guess-row.shake{animation:tileShake .35s ease}
     .chip.drop{animation:chipDrop .28s cubic-bezier(.2,1.4,.6,1)}
     .tile-new{animation:tileNew .14s ease-out}
@@ -335,12 +337,15 @@ function stopPolling(){clearInterval(S.pollTimer);S.pollTimer=null;}
 async function createRoom(game){const res=await api({action:'createRoom',game,state:JSON.stringify(roomState(game,'A'))});if(!res.ok)throw new Error(res.error||'Create failed');S.room=res.room;S.me=res.seat||'A';S.token=res.token;localStorage.setItem(`gh_token_${S.room.roomId}`,S.token);updateUrl();setSyncedNow();startPolling();render();}
 async function joinRoom(roomId){const cached=localStorage.getItem(`gh_token_${roomId}`);const res=await api({action:'joinRoom',roomId,token:cached||'',name:localStorage.getItem('gh_name_pref')||'Player'});if(!res.ok)throw new Error(res.error||'Join failed');S.room=res.room;S.me=res.seat||null;S.token=res.token||cached||null;if(S.token)localStorage.setItem(`gh_token_${roomId}`,S.token);setSyncedNow();startPolling();render();}
 async function refreshRoom(){
-  if(!S.room?.roomId)return;
+  if(!S.room?.roomId||S.pending)return;
+  const prevStr=JSON.stringify(S.room.state);
   const res=await api({action:'getRoom',roomId:S.room.roomId,token:S.token||''});
   if(!res.ok)throw new Error(res.error||'Fetch failed');
+  const newStr=JSON.stringify(res.room.state);
   S.room=res.room;if(res.seat)S.me=res.seat;
   if(S.room.state?.turnSeat!==S.me){S.localSelect=null;S.localLegal=[];}
-  setSyncedNow();render();
+  setSyncedNow();
+  if(newStr!==prevStr)render();else renderSync();
 }
 async function saveRoomState(){
   if(!S.room?.roomId||!S.token)return false;
@@ -377,23 +382,23 @@ function openMulti(game){
    ROOM STATE TEMPLATES
 ════════════════════════════════════════════════════════ */
 function roomState(game,starter='A'){
-  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
-  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
+  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
   if(game==='checkers'){
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let r=0;r<3;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='b';
     for(let r=5;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='r';
-    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
   }
   if(game==='chess'){
     const back=['r','n','b','q','k','b','n','r'];
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let c=0;c<8;c++){board[0][c]={t:back[c],c:'b'};board[1][c]={t:'p',c:'b'};board[6][c]={t:'p',c:'w'};board[7][c]={t:back[c],c:'w'};}
-    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
   }
   if(game==='battleship'){
     const side=()=>({board:Array.from({length:6},()=>Array(6).fill('')),shots:Array.from({length:6},()=>Array(6).fill('')),ships:[],placed:false});
-    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
   }
   return{game,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
 }
@@ -573,6 +578,8 @@ function renderConnect4(){
 /* ════════════════════════════════════════════════════════
    CHECKERS  (fixed: local selection, no refreshRoom on click)
 ════════════════════════════════════════════════════════ */
+function hasAnyCapture(board,side){for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=board[r][c];if(p&&pSide(p)===side&&checkMoves(board,r,c).some(m=>m.cap))return true;}return false;}
+function legalCheckMoves(board,r,c){const p=board[r][c];if(!p)return[];const side=pSide(p);const all=checkMoves(board,r,c);if(hasAnyCapture(board,side))return all.filter(m=>m.cap);return all;}
 function pSide(p){if(!p)return null;const l=p.toLowerCase();return l==='r'?'r':l==='b'?'b':null;}
 function checkMoves(board,r,c){
   const p=board[r][c];if(!p)return[];const side=pSide(p);
@@ -585,7 +592,7 @@ async function checkersMove(r,c){
   const g=S.room.state;if(!g||g.gameOver||g.turnSeat!==S.me)return;
   const mySide=S.me==='A'?'r':'b';const p=g.board[r][c];
   if(S.localSelect){
-    const[sr,sc]=S.localSelect;const mv=checkMoves(g.board,sr,sc).find(m=>m.r===r&&m.c===c);
+    const[sr,sc]=S.localSelect;const mv=legalCheckMoves(g.board,sr,sc).find(m=>m.r===r&&m.c===c);
     if(mv){
       g.board[r][c]=g.board[sr][sc];g.board[sr][sc]=null;
       if(mv.cap)g.board[mv.cap[0]][mv.cap[1]]=null;
@@ -598,19 +605,21 @@ async function checkersMove(r,c){
       if(!g.board.flat().some(x=>x&&pSide(x)===opp)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
       S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
-    if(p&&pSide(p)===mySide&&checkMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
+    if(p&&pSide(p)===mySide&&legalCheckMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
     else{S.localSelect=null;render();}
     return;
   }
-  if(p&&pSide(p)===mySide&&checkMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
+  if(p&&pSide(p)===mySide&&legalCheckMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
 }
 function renderCheckers(){
   const g=S.room.state;
-  const tgts=S.localSelect?checkMoves(g.board,S.localSelect[0],S.localSelect[1]):[];
+  const mySide2=S.me==='A'?'r':'b';
+  const forcedCapture=g.turnSeat===S.me&&hasAnyCapture(g.board,mySide2);
+  const tgts=S.localSelect?legalCheckMoves(g.board,S.localSelect[0],S.localSelect[1]):[];
   const cells=g.board.flatMap((row,r)=>row.map((p,c)=>{
-    const dark=(r+c)%2===1;const sel=S.localSelect&&S.localSelect[0]===r&&S.localSelect[1]===c;const tgt=tgts.some(m=>m.r===r&&m.c===c);
+    const dark=(r+c)%2===1;const sel=S.localSelect&&S.localSelect[0]===r&&S.localSelect[1]===c;const tgt=tgts.some(m=>m.r===r&&m.c===c);const mustCapt=forcedCapture&&p&&pSide(p)===mySide2&&checkMoves(g.board,r,c).some(m=>m.cap);
     const icon=p?`<span class="piece ${p==='r'||p==='R'?'red':'black'}">${p==='r'?'&#9920;':p==='R'?'&#9921;':p==='b'?'&#9922;':'&#9923;'}</span>`:'';
-    return `<button class="cell ${dark?'dark':'light'}${sel?' selected':''}${tgt?' target':''}" data-action="ck-cell" data-r="${r}" data-c="${c}">${icon}</button>`;
+    return `<button class="cell ${dark?'dark':'light'}${sel?' selected':''}${tgt?' target':''}\${mustCapt?' force-capture':''}" data-action="ck-cell" data-r="${r}" data-c="${c}">${icon}</button>`;
   })).join('');
   return `<div class="scene"><div class="notice wide">${g.gameOver?(g.winner==='D'?'Draw.':`${seatName(g.winner)} wins! &#127881;`):`Turn: ${seatName(g.turnSeat)}`}</div><div class="boardbox"><div class="checkers" style="grid-template-columns:repeat(8,56px)">${cells}</div></div><div class="footer-note">A=Red (moves up) &nbsp;&bull;&nbsp; B=Black (moves down) &nbsp;&bull;&nbsp; Click piece then green cell to move.</div></div>`;
 }
@@ -688,7 +697,7 @@ function battlePlace(r,c){
   for(let i=0;i<sz;i++){const nr=r+(S.battleOrient==='V'?i:0),nc=c+(S.battleOrient==='H'?i:0);if(!inside6(nr,nc))return setStatus('Ship does not fit here',false);if(my.board[nr][nc])return setStatus('Ships cannot overlap',false);coords.push([nr,nc]);}
   coords.forEach(([nr,nc])=>my.board[nr][nc]='S');my.ships.push(coords);g.shipIndex++;
   if(g.shipIndex>=g.shipSizes.length){my.placed=true;g.shipIndex=0;S.battleAwaitingLock=true;}
-  S.room.state=g;render();
+  S.room.state=g;saveRoomState().catch(()=>{});render();
 }
 async function battleLock(){
   const g=S.room.state;S.battleAwaitingLock=false;
@@ -747,7 +756,16 @@ function renderBattleship(){
 /* ════════════════════════════════════════════════════════
    ENDCARD & REMATCH
 ════════════════════════════════════════════════════════ */
-function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);resetLocalState();}
+async function leaveRoom(){
+  if(!S.room||!S.me){goHome();return;}
+  const g=S.room.state;
+  if(!g.quit)g.quit={A:false,B:false};
+  g.quit[S.me]=true;
+  S.room.state=g;
+  await saveRoomState().catch(()=>{});
+  goHome();
+}
+function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);S.room.state.quit={A:false,B:false};resetLocalState();}
 async function voteRematch(vote){
   if(!S.room||!S.me)return;const g=S.room.state;if(!g.gameOver)return;
   g.rematch[S.me]=vote;S.room.state=g;await saveRoomState().catch(()=>{});
@@ -756,11 +774,15 @@ async function voteRematch(vote){
 }
 function renderEndcard(){
   const g=S.room.state;const w=g.winner;const me=S.me;
+  // If the other player already left, show a simple "opponent left" card
+  if(g.quit?.[otherSeat(me||'A')]){
+    return `<div class="overlay"><div class="box"><div class="kicker">Game over</div><h3 style="margin:0 0 8px">Opponent left &#128075;</h3><div class="muted small">The other player has left the room.</div><div class="hr"></div><div class="toolbar"><button class="btn primary" data-action="home">&#8592; Go Home</button></div></div></div>`;
+  }
   const res=w==='D'?'draw':(w===me?'win':'loss');
   const title=w==='D'?'Draw &#9996;&#65039;':`${seatName(w)} wins! &#127942;`;
   const detail=w==='D'?'No winner this round.':`Next round starts with ${seatName(g.rematchStarter||otherSeat(w||'A'))}.`;
   const both=g.rematch?.A&&g.rematch?.B;
-  return `<div class="overlay"><div class="box"><div class="kicker">Match finished</div><h3 style="margin:0 0 8px;font-size:1.5rem">${title}</h3><div class="muted small">${detail}</div><div class="result-badges"><span class="result-badge ${res}">${w==='D'?'Draw':(res==='win'?'You won! &#127881;':'You lost')}</span><span class="result-badge${g.rematch?.A?' win':''}">A: ${g.rematch?.A?'Ready':'&mdash;'}</span><span class="result-badge${g.rematch?.B?' win':''}">B: ${g.rematch?.B?'Ready':'&mdash;'}</span></div><div class="hr"></div><div class="toolbar"><button class="btn good" data-action="vote-rematch">&#9654; Play again</button><button class="btn" data-action="clear-rematch">&#10005; Clear vote</button></div><div class="soft" style="margin-top:10px">${both?'Both ready! Starting new round&#8230;':'Waiting for both players to vote.'}</div></div></div>`;
+  return `<div class="overlay"><div class="box"><div class="kicker">Match finished</div><h3 style="margin:0 0 8px;font-size:1.5rem">${title}</h3><div class="muted small">${detail}</div><div class="result-badges"><span class="result-badge ${res}">${w==='D'?'Draw':(res==='win'?'You won! &#127881;':'You lost')}</span><span class="result-badge${g.rematch?.A?' win':''}">A: ${g.rematch?.A?'Ready':'&mdash;'}</span><span class="result-badge${g.rematch?.B?' win':''}">B: ${g.rematch?.B?'Ready':'&mdash;'}</span></div><div class="hr"></div><div class="toolbar"><button class="btn good" data-action="vote-rematch">&#9654; Play again</button><button class="btn danger" data-action="leave-room">&#128075; Leave</button></div><div class="soft" style="margin-top:10px">${both?'Both ready! Starting new round&#8230;':'Click &#9654; to vote for a rematch, or Leave to exit.'}</div></div></div>`;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -880,7 +902,7 @@ function handleAction(action,el){
   }
   if(action==='toggle-notes'){S.notesMode=!S.notesMode;render();return;}
   if(action==='vote-rematch')return voteRematch(true);
-  if(action==='clear-rematch')return voteRematch(false);
+  if(action==='leave-room')return leaveRoom();
   if(action==='sudoku-sel'){S.solo.sudoku.sel=[+el.dataset.r,+el.dataset.c];render();return;}
   if(action==='sudoku-num')return sudokuSet(...S.solo.sudoku.sel,el.dataset.n);
   if(action==='sudoku-clr')return sudokuSet(...S.solo.sudoku.sel,'');
