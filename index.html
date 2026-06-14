@@ -258,6 +258,23 @@
     .rbadge.win{background:rgba(0,212,160,.1);border-color:rgba(0,212,160,.3);color:var(--green);}
     .rbadge.loss{background:rgba(255,107,157,.1);border-color:rgba(255,107,157,.25);color:var(--pink);}
     .rbadge.draw{background:rgba(255,182,39,.1);border-color:rgba(255,182,39,.25);color:var(--gold);}
+
+    /* ── Chat ── */
+    .chat-msgs{max-height:180px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:9px;padding-right:2px;scrollbar-width:thin;}
+    .chat-msg{display:flex;flex-direction:column;gap:2px;}
+    .chat-msg.mine{align-items:flex-end;}
+    .chat-msg.theirs{align-items:flex-start;}
+    .chat-sender{font-size:.65rem;color:var(--t3);padding:0 2px;}
+    .chat-bubble{max-width:92%;padding:6px 10px;border-radius:11px;font-size:.8rem;line-height:1.4;word-break:break-word;}
+    .chat-msg.mine .chat-bubble{background:rgba(91,138,255,.2);border:1px solid rgba(91,138,255,.3);border-bottom-right-radius:3px;}
+    .chat-msg.theirs .chat-bubble{background:rgba(255,255,255,.07);border:1px solid var(--bdr);border-bottom-left-radius:3px;}
+    .chat-row{display:flex;gap:7px;align-items:center;}
+    /* ── Move log ── */
+    .log-hdr{display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;padding-bottom:2px;}
+    .log-hdr:hover{opacity:.8;}
+    .log-moves{max-height:170px;overflow-y:auto;margin-top:8px;display:flex;flex-direction:column;gap:2px;scrollbar-width:thin;}
+    .log-move{font-size:.74rem;color:var(--t2);padding:2px 6px;border-radius:5px;font-family:ui-monospace,monospace;letter-spacing:.01em;}
+    .log-move:nth-child(odd){background:rgba(255,255,255,.03);}
     /* ── Responsive ── */
     @media(max-width:1100px){.gshell{grid-template-columns:1fr;}.gsidebar{position:static;}}
     @media(max-width:720px){
@@ -342,7 +359,7 @@ const PIECES = {
 const S = {
   screen:'home', game:null, room:null, me:null, token:null,
   solo:{sudoku:null,wordle:null,crossword:null,twenty48:null,minesweeper:null,snake:null,memory:null},
-  pending:false, lastSynced:null, pollTimer:null, notesMode:false, roomError:null,
+  pending:false, lastSynced:null, pollTimer:null, notesMode:false, roomError:null, chatDraft:'', logCollapsed:false,
   // local UI state (never synced)
   localSelect:null, localLegal:[],
   battleOrient:'H', battleAwaitingLock:false, lastConnect4:null
@@ -456,23 +473,23 @@ function openMulti(game){
    ROOM STATE TEMPLATES
 ════════════════════════════════════════════════════════ */
 function roomState(game,starter='A'){
-  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
-  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
+  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
+  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
   if(game==='checkers'){
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let r=0;r<3;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='b';
     for(let r=5;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='r';
-    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
+    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},log:[],chat:[],version:0};
   }
   if(game==='chess'){
     const back=['r','n','b','q','k','b','n','r'];
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let c=0;c<8;c++){board[0][c]={t:back[c],c:'b'};board[1][c]={t:'p',c:'b'};board[6][c]={t:'p',c:'w'};board[7][c]={t:back[c],c:'w'};}
-    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
+    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},log:[],chat:[],version:0};
   }
   if(game==='battleship'){
     const side=()=>({board:Array.from({length:6},()=>Array(6).fill('')),shots:Array.from({length:6},()=>Array(6).fill('')),ships:[],placed:false});
-    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},version:0};
+    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
   }
   return{game,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
 }
@@ -508,7 +525,8 @@ function wEnter(){
   const w=S.solo.wordle;if(w.won||w.lost)return;
   if(w.col<5){const row=document.querySelectorAll('.guess-row')[w.row];if(row){row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');}setStatus('Need 5 letters',false);return;}
   const guess=w.rows[w.row].join('').toUpperCase();
-  if(!VALID_WORDS.has(guess)){const row=document.querySelectorAll('.guess-row')[w.row];if(row){row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');}setStatus('Not a valid word — try another!',false);return;}
+  const isKnown=VALID_WORDS.has(guess),hasVowel=/[AEIOU]/.test(guess);
+  if(!isKnown&&!hasVowel){const row=document.querySelectorAll('.guess-row')[w.row];if(row){row.classList.remove('shake');void row.offsetWidth;row.classList.add('shake');}setStatus('Not a valid word',false);return;}
   const ans=w.answer.toUpperCase();
   const result=Array(5).fill('absent');const pool=ans.split('');
   for(let i=0;i<5;i++)if(guess[i]===ans[i]){result[i]='correct';pool[i]=null;}
@@ -737,7 +755,10 @@ async function checkersMove(r,c){
   if(S.localSelect){
     const[sr,sc]=S.localSelect;const mv=legalCheckMoves(g.board,sr,sc).find(m=>m.r===r&&m.c===c);
     if(mv){
+      const _cols2='abcdefgh';const _rows2='87654321';
+      const _entry2=`${S.me==='A'?'Red':'Black'}: ${_cols2[sc]}${_rows2[sr]}${mv.cap?'x':'->'}${_cols2[c]}${_rows2[r]}`;
       g.board[r][c]=g.board[sr][sc];g.board[sr][sc]=null;
+      if(!g.log)g.log=[];g.log.push(_entry2);if(g.log.length>120)g.log=g.log.slice(-120);
       if(mv.cap)g.board[mv.cap[0]][mv.cap[1]]=null;
       if(g.board[r][c]==='r'&&r===0)g.board[r][c]='R';
       if(g.board[r][c]==='b'&&r===7)g.board[r][c]='B';
@@ -801,7 +822,10 @@ async function chessMove(r,c){
     if(mv){
       const nb=cloneBoard(g.board);nb[r][c]=nb[sr][sc];nb[sr][sc]=null;
       if(nb[r][c].t==='p'&&(r===0||r===7))nb[r][c].t='q';
+      const _cols='abcdefgh';const _pc={k:'K',q:'Q',r:'R',b:'B',n:'N',p:''}[g.board[sr][sc]?.t||'p'];
+      const _entry=`${S.me==='A'?'White':'Black'}: ${_pc}${_cols[sc]}${8-sr}${g.board[r][c]?'x':'->'}${_cols[c]}${8-r}`;
       g.board=nb;g.turnSeat=otherSeat(g.turnSeat);S.localSelect=null;S.localLegal=[];
+      if(!g.log)g.log=[];g.log.push(_entry);if(g.log.length>120)g.log=g.log.slice(-120);
       updateChessStatus(g);if(g.gameOver)setTimeout(showConfetti,200);
       S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
@@ -825,7 +849,7 @@ function renderChess(){
 /* ════════════════════════════════════════════════════════
    BATTLESHIP  (fixed: local orient, lock phase, correct shot display)
 ════════════════════════════════════════════════════════ */
-function clearBattlePrev(){document.querySelectorAll('.cell.ship-preview,.cell.ship-preview-invalid').forEach(el=>el.classList.remove('ship-preview','ship-preview-invalid'));}
+function clearBattlePrev(){document.querySelectorAll('.bsq.ship-preview,.bsq.ship-preview-invalid').forEach(el=>el.classList.remove('ship-preview','ship-preview-invalid'));}
 function updateBattlePrev(cell){
   clearBattlePrev();if(!cell||!S.room?.state)return;
   const g=S.room.state;const myPhase=S.me==='A'?'placeA':'placeB';
@@ -887,7 +911,7 @@ function renderBattleship(){
   const bCells=my.board.flatMap((row,r)=>row.map((v,c_)=>`<button class="bsq ${(r+c_)%2===1?'dk':'lt'}${v==='S'?' has-ship':''}" data-action="bt-place" data-r="${r}" data-c="${c_}">${v==='S'?'<span style="font-size:.7rem">&#9632;</span>':''}</button>`)).join('');
   return `<div class="scene"><div class="notice">Placing ${curSz}-unit ship (${g.shipSizes.length-g.shipIndex} left)</div><div class="toolbar">${pips}<button class="btn sm" data-action="bt-orient">&#8635; ${S.battleOrient==='H'?'H':'V'}</button></div><div class="boardbox"><div class="bat-board fire-grid">${bCells}</div></div><div class="footer-note">Tap a cell to place &nbsp;&bull;&nbsp; Rotate to change direction</div></div>`;
 }
-function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);S.room.state.quit={A:false,B:false};resetLocalState();}
+function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);S.room.state.quit={A:false,B:false};S.room.state.chat=[];if(S.room.state.log)S.room.state.log=[];resetLocalState();}
 async function voteRematch(vote){
   if(!S.room||!S.me)return;const g=S.room.state;if(!g.gameOver)return;
   g.rematch[S.me]=vote;S.room.state=g;await saveRoomState().catch(()=>{});
@@ -910,9 +934,27 @@ function renderEndcard(){
 function card(kind,title,desc,btn,action){return `<div class="card"><div class="badge ${kind==='Solo'?'solo':'multi'}">${kind}</div><h3>${title}</h3><p>${desc}</p><div class="row"><button class="btn primary" data-action="${action}">${btn}</button></div></div>`;}
 function syncBar(){return `<div class="syncbar"><div id="sync" class="sync-left"><span style="width:16px;height:16px;display:inline-block"></span><span>${esc(syncText())}</span></div><div class="muted small">${S.room?`Room ${esc(S.room.roomId)}`:'Local only'}</div></div>`;}
 function sidePanel(){
-  const turn=S.room?.state?.turnSeat?seatName(S.room.state.turnSeat):'&mdash;';
-  const link=shareUrl();
-  return `<div class="scard"><div class="slbl">Room</div><div class="seat-row">${S.room?`<span class="stag mine">${seatName(S.me)}</span><span class="stag turn">Turn: ${turn}</span>`:'<span class="stag">No room</span>'}</div><input class="room-link" style="width:100%;font-size:.72rem;font-family:ui-monospace,monospace" value="${esc(link)}" readonly onclick="this.select()" /><div class="toolbar" style="margin-top:9px"><button class="btn sm teal" data-action="copy-link">Copy</button><button class="btn sm" data-action="do-refresh">&#8635;</button></div></div><div class="scard"><div class="slbl">Sync</div><div class="sync-row" id="sync"><span style="width:14px;height:14px;display:inline-block"></span><span>${esc(syncText())}</span></div></div>`;
+  const g=S.room?.state;const game=S.game;
+  const turn=g?.turnSeat?seatName(g.turnSeat):'&mdash;';
+  /* Room card */
+  const roomCard=`<div class="scard"><div class="slbl">Room</div><div class="seat-row">${S.room?`<span class="stag mine">${seatName(S.me)}</span><span class="stag turn">&#8594; ${turn}</span>`:'<span class="stag">No room</span>'}</div><input class="room-link" style="width:100%;font-size:.7rem;font-family:ui-monospace,monospace;margin-bottom:8px" value="${esc(shareUrl())}" readonly onclick="this.select()" /><div class="toolbar"><button class="btn sm teal" data-action="copy-link">Copy link</button><button class="btn sm" data-action="do-refresh">&#8635;</button></div></div>`;
+  /* Move log (chess + checkers) */
+  let logCard='';
+  if(g&&(game==='chess'||game==='checkers')){
+    const log=g.log||[];const col=S.logCollapsed;
+    const moveHtml=log.length?[...log].reverse().map(m=>`<div class="log-move">${esc(m)}</div>`).join(''):`<div class="muted" style="font-size:.74rem">No moves yet.</div>`;
+    logCard=`<div class="scard"><div class="log-hdr" data-action="toggle-log"><div class="slbl" style="margin:0">Moves (${log.length})</div><span style="font-size:.8rem;color:var(--t2)">${col?'+':'-'}</span></div>${col?'':(`<div class="log-moves">${moveHtml}</div>`)}</div>`;
+  }
+  /* Chat */
+  const chat=g?.chat||[];
+  const msgHtml=chat.length?chat.map(msg=>{
+    const mine=msg.s===S.me;
+    return `<div class="chat-msg ${mine?'mine':'theirs'}"><div class="chat-sender">${seatName(msg.s)}</div><div class="chat-bubble">${esc(msg.t)}</div></div>`;
+  }).join(''):`<div class="muted" style="font-size:.76rem;text-align:center;padding:6px 0">No messages yet &mdash; say hi!</div>`;
+  const chatCard=`<div class="scard"><div class="slbl">Chat</div><div class="chat-msgs" id="chatMessages">${msgHtml}</div><div class="chat-row"><input id="chatInput" class="field" style="flex:1;min-width:0;padding:7px 10px;font-size:.8rem" placeholder="Message&hellip;" maxlength="200" /><button class="btn sm primary" data-action="send-chat">&#8594;</button></div></div>`;
+  /* Sync */
+  const syncCard=`<div class="scard"><div class="slbl">Sync</div><div class="sync-row" id="sync"><span style="width:14px;height:14px;display:inline-block"></span><span style="font-size:.75rem">${esc(syncText())}</span></div></div>`;
+  return roomCard+logCard+chatCard+syncCard;
 }
 function renderHome(){
   const url=localStorage.getItem('gh_backend_url')||CONFIG.backendUrl;
@@ -952,6 +994,9 @@ function render(){
   renderSync();
   const uIn=document.getElementById('backendUrlInput');
   if(uIn)uIn.value=localStorage.getItem('gh_backend_url')||CONFIG.backendUrl;
+  const ci=document.getElementById('chatInput');if(ci&&S.chatDraft!==undefined)ci.value=S.chatDraft;
+  const cm=document.getElementById('chatMessages');if(cm)cm.scrollTop=cm.scrollHeight;
+  const lm=document.querySelector('.log-moves');if(lm)lm.scrollTop=0;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1004,6 +1049,17 @@ function handleAction(action,el){
   if(action==='toggle-notes'){S.notesMode=!S.notesMode;render();return;}
   if(action==='vote-rematch')return voteRematch(true);
   if(action==='leave-room')return leaveRoom();
+  if(action==='send-chat'){
+    const inp=document.getElementById('chatInput');
+    const txt=(inp?.value||S.chatDraft||'').trim().slice(0,200);
+    if(!txt||!S.room||!S.me)return;
+    const g=S.room.state;if(!g.chat)g.chat=[];
+    g.chat.push({s:S.me,t:txt,ts:Date.now()});
+    if(g.chat.length>80)g.chat=g.chat.slice(-80);
+    S.chatDraft='';S.room.state=g;
+    saveRoomState().catch(()=>{});render();return;
+  }
+  if(action==='toggle-log'){S.logCollapsed=!S.logCollapsed;render();return;}
   if(action==='sudoku-sel'){S.solo.sudoku.sel=[+el.dataset.r,+el.dataset.c];render();return;}
   if(action==='sudoku-num')return sudokuSet(...S.solo.sudoku.sel,el.dataset.n);
   if(action==='sudoku-clr')return sudokuSet(...S.solo.sudoku.sel,'');
@@ -1022,7 +1078,7 @@ function handleAction(action,el){
   if(action==='mine-reveal')return mineReveal(+el.dataset.r,+el.dataset.c);
   if(action==='mine-flag-toggle'){S.solo.minesweeper.flagMode=!S.solo.minesweeper.flagMode;render();return;}
   if(action==='t48-continue'){S.solo.twenty48.continued=true;render();return;}
-  if(action==='snake-tap'){snakeDir(0,1);return;}
+  if(action==='snake-tap'){const _s=S.solo.snake;if(_s&&!_s.started&&!_s.over){_s.started=true;_s.timer=setInterval(snakeTick,_s.speed);render();}return;}
   if(action==='mem-flip')return memFlip(+el.dataset.id);
 }
 
@@ -1037,8 +1093,12 @@ document.addEventListener('change',e=>{
   if(el.id==='mineDiff'){initMinesweeper(el.value);render();return;}
   if(el.matches('[data-action="cw-cell"]'))cwSet(+el.dataset.r,+el.dataset.c,el.value);
 });
-document.addEventListener('input',e=>{if(e.target.matches('[data-action="cw-cell"]'))cwSet(+e.target.dataset.r,+e.target.dataset.c,e.target.value);});
+document.addEventListener('input',e=>{
+  if(e.target.matches('[data-action="cw-cell"]'))cwSet(+e.target.dataset.r,+e.target.dataset.c,e.target.value);
+  if(e.target.id==='chatInput')S.chatDraft=e.target.value;
+});
 document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id==='chatInput'){e.preventDefault();handleAction('send-chat',e.target);return;}
   if(S.screen==='solo'&&S.game==='sudoku'){
     if(/^[1-9]$/.test(e.key)){e.preventDefault();sudokuSet(...S.solo.sudoku.sel,e.key);}
     else if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();sudokuSet(...S.solo.sudoku.sel,'');}
