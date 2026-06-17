@@ -235,12 +235,8 @@
     .mine-cell.mine-shown{background:rgba(255,107,157,.1);}
     .m1{color:var(--blue);}.m2{color:var(--teal);}.m3{color:var(--pink);}.m4{color:var(--purple);}
     .m5{color:var(--gold);}.m6{color:#40e0d0;}.m7{color:#ff69b4;}.m8{color:var(--t2);}
-    /* ── Snake ── */
-    .snake-wrap{touch-action:none;user-select:none;}
-    .snake-board{display:grid;grid-template-columns:repeat(20,1fr);aspect-ratio:1;width:min(400px,100%);border:2px solid var(--bdr2);border-radius:16px;overflow:hidden;background:rgba(4,12,28,.85);box-shadow:var(--md);cursor:pointer;}
-    .sc{} .sc.head{background:var(--teal);} .sc.body{background:rgba(0,229,204,.6);}
-    .sc.food{background:var(--pink);border-radius:50%;margin:2px;animation:snakePulse .7s ease infinite;}
-    .sc.tail{background:rgba(0,229,204,.3);}
+    /* ── Snake (canvas) ── */
+    #snakeCanvas{display:block;border-radius:18px;border:2px solid rgba(255,255,255,.14);box-shadow:var(--md);touch-action:none;cursor:pointer;width:min(440px,90vw);height:min(440px,90vw);background:#040c1c;}
     /* ── Memory ── */
     .mem-grid{display:grid;gap:10px;width:fit-content;margin:0 auto;}
     .mem-card{width:70px;height:88px;border-radius:13px;border:1px solid var(--bdr);cursor:pointer;display:grid;place-items:center;font-size:1.9rem;transition:transform .16s,border-color .16s,background .16s;}
@@ -472,26 +468,28 @@ function openMulti(game){
 /* ════════════════════════════════════════════════════════
    ROOM STATE TEMPLATES
 ════════════════════════════════════════════════════════ */
-function roomState(game,starter='A'){
-  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
-  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
+function roomState(game,starter){
+  if(!starter)starter='A';
+  const nextStarter=starter==='A'?'B':'A';
+  if(game==='ttt')return{game,board:Array(9).fill(''),turnSeat:starter,firstSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,quit:{A:false,B:false},chat:[],version:0};
+  if(game==='connect4')return{game,board:Array.from({length:6},()=>Array(7).fill('')),turnSeat:starter,firstSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,quit:{A:false,B:false},chat:[],version:0};
   if(game==='checkers'){
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let r=0;r<3;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='b';
     for(let r=5;r<8;r++)for(let c=0;c<8;c++)if((r+c)%2===1)board[r][c]='r';
-    return{game,board,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},log:[],chat:[],version:0};
+    return{game,board,turnSeat:starter,firstSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,quit:{A:false,B:false},log:[],chat:[],version:0};
   }
   if(game==='chess'){
     const back=['r','n','b','q','k','b','n','r'];
     const board=Array.from({length:8},()=>Array(8).fill(null));
     for(let c=0;c<8;c++){board[0][c]={t:back[c],c:'b'};board[1][c]={t:'p',c:'b'};board[6][c]={t:'p',c:'w'};board[7][c]={t:back[c],c:'w'};}
-    return{game,board,turnSeat:starter,status:'White to move',winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},log:[],chat:[],version:0};
+    return{game,board,turnSeat:starter,firstSeat:starter,status:'White to move',castleRights:{wK:true,wQ:true,bK:true,bQ:true},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,quit:{A:false,B:false},log:[],chat:[],version:0};
   }
   if(game==='battleship'){
     const side=()=>({board:Array.from({length:6},()=>Array(6).fill('')),shots:Array.from({length:6},()=>Array(6).fill('')),ships:[],placed:false});
-    return{game,phase:'placeA',turnSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',quit:{A:false,B:false},chat:[],version:0};
+    return{game,phase:'placeA',turnSeat:starter,firstSeat:starter,shipSizes:[3,2,2],shipIndex:0,sides:{A:side(),B:side()},winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,quit:{A:false,B:false},chat:[],version:0};
   }
-  return{game,turnSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:'A',version:0};
+  return{game,turnSeat:starter,firstSeat:starter,winner:null,gameOver:false,rematch:{A:false,B:false},rematchStarter:nextStarter,version:0};
 }
 
 /* ════════════════════════════════════════════════════════
@@ -638,36 +636,74 @@ function initSnake(){
   const snake=[[10,10],[10,9],[10,8]];
   S.solo.snake={grid:20,snake,dir:[0,1],nextDir:[0,1],food:spawnFood(snake,20),score:0,best,over:false,started:false,timer:null,speed:180};
 }
+function drawSnakeCanvas(){
+  const canvas=document.getElementById('snakeCanvas');if(!canvas||!S.solo.snake)return;
+  const s=S.solo.snake;const g=s.grid;
+  const size=canvas.offsetWidth||400;
+  if(canvas.width!==size){canvas.width=size;canvas.height=size;}
+  const cs=size/g;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#040c1c';ctx.fillRect(0,0,size,size);
+  for(let r=0;r<g;r++)for(let c=0;c<g;c++){ctx.fillStyle=(r+c)%2===0?'rgba(255,255,255,.015)':'rgba(0,0,0,.1)';ctx.fillRect(c*cs,r*cs,cs,cs);}
+  const fr=s.food[0],fc=s.food[1];
+  ctx.shadowColor='#ff6b9d';ctx.shadowBlur=cs*0.8;
+  ctx.fillStyle='#ff6b9d';ctx.beginPath();ctx.arc(fc*cs+cs/2,fr*cs+cs/2,cs*0.36,0,Math.PI*2);ctx.fill();
+  ctx.shadowBlur=0;
+  s.snake.forEach((seg,i)=>{
+    const r=seg[0],c=seg[1];
+    const alpha=Math.max(0.28,1-i*0.025);
+    ctx.fillStyle=i===0?'#00e5cc':`rgba(0,229,204,${alpha})`;
+    const pad=i===0?1:2;const rr=cs*0.22;
+    const x=c*cs+pad,y=r*cs+pad,w=cs-pad*2,h=cs-pad*2;
+    ctx.beginPath();ctx.moveTo(x+rr,y);ctx.lineTo(x+w-rr,y);ctx.arcTo(x+w,y,x+w,y+rr,rr);ctx.lineTo(x+w,y+h-rr);ctx.arcTo(x+w,y+h,x+w-rr,y+h,rr);ctx.lineTo(x+rr,y+h);ctx.arcTo(x,y+h,x,y+h-rr,rr);ctx.lineTo(x,y+rr);ctx.arcTo(x,y,x+rr,y,rr);ctx.closePath();ctx.fill();
+    if(i===0){
+      ctx.fillStyle='#040c1c';const ex=cs*0.22,ey=cs*0.22,er=cs*0.08;const dr=s.dir[0],dc=s.dir[1];
+      ctx.beginPath();ctx.arc(x+w/2+dc*ex-dr*ex*0.5+ex*0.4,y+h/2+dr*ey-dc*ey*0.5+ey*0.4,er,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();ctx.arc(x+w/2+dc*ex-dr*ex*0.5-ex*0.4,y+h/2+dr*ey-dc*ey*0.5-ey*0.4,er,0,Math.PI*2);ctx.fill();
+    }
+  });
+  if(s.over){
+    ctx.fillStyle='rgba(3,9,18,.78)';ctx.fillRect(0,0,size,size);
+    ctx.fillStyle='#ff6b9d';ctx.font=`bold ${size*0.07}px Inter,sans-serif`;ctx.textAlign='center';ctx.fillText('GAME OVER',size/2,size/2-size*0.06);
+    ctx.fillStyle='#f0f4ff';ctx.font=`${size*0.045}px Inter,sans-serif`;ctx.fillText('Score: '+s.score,size/2,size/2+size*0.04);
+    ctx.fillStyle='rgba(0,229,204,.75)';ctx.font=`${size*0.034}px Inter,sans-serif`;ctx.fillText('Tap to play again',size/2,size/2+size*0.11);
+  }else if(!s.started){
+    ctx.fillStyle='rgba(3,9,18,.55)';ctx.fillRect(0,0,size,size);
+    ctx.fillStyle='#00e5cc';ctx.font=`bold ${size*0.05}px Inter,sans-serif`;ctx.textAlign='center';
+    ctx.fillText('TAP OR PRESS ARROW',size/2,size/2-size*0.02);
+    ctx.fillText('KEY TO START',size/2,size/2+size*0.06);
+  }
+}
 function snakeTick(){
   const s=S.solo.snake;if(!s||s.over)return;
   s.dir=s.nextDir;
   const h=s.snake[0];
   const nh=[(h[0]+s.dir[0]+s.grid)%s.grid,(h[1]+s.dir[1]+s.grid)%s.grid];
-  if(s.snake.some(([r,c])=>r===nh[0]&&c===nh[1])){
+  if(s.snake.some(seg=>seg[0]===nh[0]&&seg[1]===nh[1])){
     s.over=true;if(s.score>s.best){s.best=s.score;localStorage.setItem('gh_snake_best',s.best);}
-    clearInterval(s.timer);s.timer=null;render();return;
+    clearInterval(s.timer);s.timer=null;drawSnakeCanvas();return;
   }
   s.snake.unshift(nh);
   if(nh[0]===s.food[0]&&nh[1]===s.food[1]){
     s.score+=10;if(s.score>s.best){s.best=s.score;localStorage.setItem('gh_snake_best',s.best);}
     s.food=spawnFood(s.snake,s.grid);
+    const sv=document.getElementById('snakeScore');if(sv)sv.textContent=s.score;
+    const bv=document.getElementById('snakeBest');if(bv)bv.textContent=s.best;
     if(s.score%60===0&&s.speed>80){clearInterval(s.timer);s.speed=Math.max(80,s.speed-18);s.timer=setInterval(snakeTick,s.speed);}
-  }else{s.snake.pop();}
-  render();
+  }else{
+    s.snake.pop();
+  }
+  drawSnakeCanvas();
 }
 function snakeDir(dr,dc){
-  const s=S.solo.snake;if(!s||s.over)return;
+  const s=S.solo.snake;if(!s)return;
+  if(s.over){initSnake();render();return;}
   if(dr===-s.dir[0]&&dc===-s.dir[1])return;
   s.nextDir=[dr,dc];
-  if(!s.started){s.started=true;s.timer=setInterval(snakeTick,s.speed);}
+  if(!s.started){s.started=true;s.timer=setInterval(snakeTick,s.speed);drawSnakeCanvas();}
 }
 function renderSnake(){
   const s=S.solo.snake;
-  const cells=Array(s.grid*s.grid).fill('');
-  s.snake.forEach(([r,c],i)=>cells[r*s.grid+c]=i===0?'head':i===s.snake.length-1?'tail':'body');
-  cells[s.food[0]*s.grid+s.food[1]]='food';
-  const grid=cells.map(v=>`<div class="sc${v?' '+v:''}"></div>`).join('');
-  return `<div class="scene"><div class="sboxes"><div class="sbox"><div class="slbl">Score</div><div class="sval">${s.score}</div></div><div class="sbox"><div class="slbl">Best</div><div class="sval">${s.best}</div></div></div>${s.over?`<div class="notice err" style="text-align:center">&#128165; Game Over &mdash; score: ${s.score}! <button class="btn sm teal" data-action="new-solo">&#8635; Play Again</button></div>`:''}${!s.started&&!s.over?`<div class="soft" style="text-align:center;font-size:.82rem">Tap the board or press an arrow key to start &mdash; avoid your own tail!</div>`:''}<div class="snake-wrap"><div class="snake-board" id="snakeBoard" data-action="snake-tap">${grid}</div></div><div class="footer-note">Arrow keys or swipe to move &bull; Eating food speeds you up!</div></div>`;
+  return `<div class="scene"><div class="sboxes"><div class="sbox"><div class="slbl">Score</div><div class="sval" id="snakeScore">${s.score}</div></div><div class="sbox"><div class="slbl">Best</div><div class="sval" id="snakeBest">${s.best}</div></div></div><canvas id="snakeCanvas" data-action="snake-tap"></canvas><div class="footer-note">Arrow keys or swipe to move &bull; Eat food to grow &bull; Don&#39;t hit yourself!</div></div>`;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -717,8 +753,8 @@ async function tttMove(i){
   await refreshRoom().catch(()=>{});const g=S.room.state;
   if(g.gameOver||g.board[i]||g.turnSeat!==S.me)return;
   g.board[i]=S.me==='A'?'X':'O';
-  if(tttWin(g.board)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
-  else if(g.board.every(Boolean)){g.winner='D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter='A';}
+  if(tttWin(g.board)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';setTimeout(showConfetti,200);}
+  else if(g.board.every(Boolean)){g.winner='D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';}
   else g.turnSeat=otherSeat(g.turnSeat);
   S.room.state=g;await saveRoomState().catch(()=>{});render();
 }
@@ -727,6 +763,41 @@ function renderTTT(){
   const isMyTurn=g.turnSeat===S.me&&!g.gameOver;
   const status=g.gameOver?(g.winner==='D'?'Draw &#9996;&#65039;':`${seatName(g.winner)} wins! &#127881;`):`${seatName(g.turnSeat)}'s turn`;
   return `<div class="scene"><div class="notice ${g.gameOver?'ok':''}">${status}</div><div class="boardbox"><div class="tic">${g.board.map((v,i)=>`<button class="cell${wc.has(i)?' selected':''}${!v&&isMyTurn?'':' given'}" data-action="ttt-move" data-i="${i}" style="font-size:2.3rem">${v||''}</button>`).join('')}</div></div><div class="footer-note">You are ${seatName(S.me)} &nbsp;&bull;&nbsp; Only your turn allows moves.</div></div>`;
+}
+function c4Win(board,r,c,p){
+  const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+  for(const dir of dirs){
+    const dr=dir[0],dc=dir[1];let n=1;
+    for(const sg of[1,-1]){
+      let nr=r+dr*sg,nc=c+dc*sg;
+      while(board[nr]&&board[nr][nc]===p){n++;nr+=dr*sg;nc+=dc*sg;}
+    }
+    if(n>=4)return true;
+  }
+  return false;
+}
+async function connectMove(col){
+  await refreshRoom().catch(()=>{});
+  const g=S.room.state;
+  if(g.gameOver||g.turnSeat!==S.me)return;
+  for(let r=5;r>=0;r--){
+    if(!g.board[r][col]){
+      const disc=g.turnSeat==='A'?'R':'Y';
+      g.board[r][col]=disc;S.lastConnect4=[r,col];
+      if(c4Win(g.board,r,col,disc)){
+        g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};
+        g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';
+        setTimeout(showConfetti,200);
+      }else if(g.board.every(row=>row.every(Boolean))){
+        g.winner='D';g.gameOver=true;g.rematch={A:false,B:false};
+        g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';
+      }else{
+        g.turnSeat=otherSeat(g.turnSeat);
+      }
+      S.room.state=g;await saveRoomState().catch(()=>{});render();return;
+    }
+  }
+  setStatus('Column is full',false);
 }
 function renderConnect4(){
   const g=S.room.state;const isMyTurn=g.turnSeat===S.me&&!g.gameOver;
@@ -766,7 +837,7 @@ async function checkersMove(r,c){
       if(moreCap){S.localSelect=[r,c];}
       else{S.localSelect=null;g.turnSeat=otherSeat(g.turnSeat);}
       const side=pSide(g.board[r][c]);const opp=side==='r'?'b':'r';
-      if(!g.board.flat().some(x=>x&&pSide(x)===opp)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(S.me);setTimeout(showConfetti,200);}
+      if(!g.board.flat().some(x=>x&&pSide(x)===opp)){g.winner=S.me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';setTimeout(showConfetti,200);}
       S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
     if(p&&pSide(p)===mySide&&legalCheckMoves(g.board,r,c).length){S.localSelect=[r,c];render();}
@@ -794,47 +865,87 @@ function renderCheckers(){
 /* ════════════════════════════════════════════════════════
    CHESS  (fixed: local selection, full legal move check)
 ════════════════════════════════════════════════════════ */
-function pseudoMoves(board,r,c,atkOnly=false){
+function pseudoMoves(board,r,c,atkOnly,cr){
+  if(atkOnly===undefined)atkOnly=false;
   const p=board[r][c];if(!p)return[];const sd=p.c;const mv=[];
   const add=(nr,nc)=>{if(!inside(nr,nc))return;const t=board[nr][nc];if(!t)mv.push({r:nr,c:nc});else if(t.c!==sd)mv.push({r:nr,c:nc});};
   if(p.t==='p'){const dir=sd==='w'?-1:1,st=sd==='w'?6:1;if(!atkOnly&&!board[r+dir]?.[c]){mv.push({r:r+dir,c});if(r===st&&!board[r+2*dir]?.[c])mv.push({r:r+2*dir,c});}for(const dc of[-1,1]){const nr=r+dir,nc=c+dc;if(!inside(nr,nc))continue;const t=board[nr][nc];if(atkOnly)mv.push({r:nr,c:nc});else if(t&&t.c!==sd)mv.push({r:nr,c:nc});}}
   if(p.t==='n')[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([dr,dc])=>add(r+dr,c+dc));
   const sliders=[];if(p.t==='b'||p.t==='q')sliders.push([1,1],[1,-1],[-1,1],[-1,-1]);if(p.t==='r'||p.t==='q')sliders.push([1,0],[-1,0],[0,1],[0,-1]);
   for(const[dr,dc]of sliders){let nr=r+dr,nc=c+dc;while(inside(nr,nc)){const t=board[nr][nc];if(!t)mv.push({r:nr,c:nc});else{if(t.c!==sd)mv.push({r:nr,c:nc});break;}nr+=dr;nc+=dc;}}
-  if(p.t==='k')for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)if(dr||dc)add(r+dr,c+dc);
+  if(p.t==='k'){
+    for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++)if(dr||dc)add(r+dr,c+dc);
+    if(!atkOnly&&cr){
+      const row=sd==='w'?7:0;
+      if(r===row&&c===4){
+        if((sd==='w'?cr.wK:cr.bK)&&!board[row][5]&&!board[row][6]&&board[row][7]&&board[row][7].t==='r'&&board[row][7].c===sd)mv.push({r:row,c:6,castle:'K'});
+        if((sd==='w'?cr.wQ:cr.bQ)&&!board[row][1]&&!board[row][2]&&!board[row][3]&&board[row][0]&&board[row][0].t==='r'&&board[row][0].c===sd)mv.push({r:row,c:2,castle:'Q'});
+      }
+    }
+  }
   return mv;
 }
 function attacked(board,r,c,bySide){for(let sr=0;sr<8;sr++)for(let sc=0;sc<8;sc++){const p=board[sr][sc];if(p&&p.c===bySide&&pseudoMoves(board,sr,sc,true).some(m=>m.r===r&&m.c===c))return true;}return false;}
 function findKing(board,side){for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=board[r][c];if(p&&p.t==='k'&&p.c===side)return[r,c];}return null;}
-function legalMoves(board,r,c){const p=board[r][c];if(!p)return[];const sd=p.c;return pseudoMoves(board,r,c,false).filter(m=>{const nb=cloneBoard(board);nb[m.r][m.c]=nb[r][c];nb[r][c]=null;if(nb[m.r][m.c].t==='p'&&(m.r===0||m.r===7))nb[m.r][m.c].t='q';const k=findKing(nb,sd);return k&&!attacked(nb,k[0],k[1],sd==='w'?'b':'w');});}
+function legalMoves(board,r,c,cr){
+  const p=board[r][c];if(!p)return[];const sd=p.c;const opp=sd==='w'?'b':'w';
+  return pseudoMoves(board,r,c,false,cr).filter(m=>{
+    if(m.castle){
+      const row=sd==='w'?7:0;
+      if(attacked(board,row,4,opp))return false;
+      if(m.castle==='K'&&(attacked(board,row,5,opp)||attacked(board,row,6,opp)))return false;
+      if(m.castle==='Q'&&(attacked(board,row,3,opp)||attacked(board,row,2,opp)))return false;
+      return true;
+    }
+    const nb=cloneBoard(board);nb[m.r][m.c]=nb[r][c];nb[r][c]=null;
+    if(nb[m.r][m.c].t==='p'&&(m.r===0||m.r===7))nb[m.r][m.c].t='q';
+    const k=findKing(nb,sd);return k&&!attacked(nb,k[0],k[1],opp);
+  });
+}
 function updateChessStatus(g){
   const sd=g.turnSeat==='A'?'w':'b',opp=sd==='w'?'b':'w';
-  let any=false;for(let r=0;r<8&&!any;r++)for(let c=0;c<8&&!any;c++){const p=g.board[r][c];if(p&&p.c===sd&&legalMoves(g.board,r,c).length)any=true;}
+  let any=false;for(let r=0;r<8&&!any;r++)for(let c=0;c<8&&!any;c++){const p=g.board[r][c];if(p&&p.c===sd&&legalMoves(g.board,r,c,g.castleRights).length)any=true;}
   const k=findKing(g.board,sd);const inChk=k?attacked(g.board,k[0],k[1],opp):false;
   g.status=`${sd==='w'?'White':'Black'} to move${inChk?' &mdash; Check!':''}`;
-  if(!any){g.winner=inChk?(opp==='w'?'A':'B'):'D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=g.winner!=='D'?(g.winner==='A'?'B':'A'):'A';}
+  if(!any){g.winner=inChk?(opp==='w'?'A':'B'):'D';g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';}
 }
 async function chessMove(r,c){
   const g=S.room.state;if(!g||g.gameOver)return;if(g.turnSeat!==S.me){setStatus('Not your turn',false);return;}
   const mySide=S.me==='A'?'w':'b';
+  if(!g.castleRights)g.castleRights={wK:true,wQ:true,bK:true,bQ:true};
+  const cr=g.castleRights;
   if(S.localSelect){
     const[sr,sc]=S.localSelect;const mv=S.localLegal.find(m=>m.r===r&&m.c===c);
     if(mv){
-      const nb=cloneBoard(g.board);nb[r][c]=nb[sr][sc];nb[sr][sc]=null;
-      if(nb[r][c].t==='p'&&(r===0||r===7))nb[r][c].t='q';
-      const _cols='abcdefgh';const _pc={k:'K',q:'Q',r:'R',b:'B',n:'N',p:''}[g.board[sr][sc]?.t||'p'];
-      const _entry=`${S.me==='A'?'White':'Black'}: ${_pc}${_cols[sc]}${8-sr}${g.board[r][c]?'x':'->'}${_cols[c]}${8-r}`;
-      g.board=nb;g.turnSeat=otherSeat(g.turnSeat);S.localSelect=null;S.localLegal=[];
+      const _cols='abcdefgh';const _mp=g.board[sr][sc];
+      const _pc={k:'K',q:'Q',r:'R',b:'B',n:'N',p:''}[_mp?_mp.t:'p'];
+      const _cap=!!g.board[r][c];
+      const _entry=mv.castle?(S.me==='A'?'White':'Black')+': O-O'+(mv.castle==='Q'?'-O':''):
+        (S.me==='A'?'White':'Black')+': '+_pc+_cols[sc]+(8-sr)+(_cap?'x':'-')+'>'+_cols[c]+(8-r);
+      const nb=cloneBoard(g.board);
+      if(mv.castle){
+        nb[r][c]=nb[sr][sc];nb[sr][sc]=null;
+        if(mv.castle==='K'){nb[r][5]=nb[r][7];nb[r][7]=null;}
+        else{nb[r][3]=nb[r][0];nb[r][0]=null;}
+      }else{
+        nb[r][c]=nb[sr][sc];nb[sr][sc]=null;
+        if(nb[r][c].t==='p'&&(r===0||r===7))nb[r][c].t='q';
+      }
+      if(_mp&&_mp.t==='k'){if(_mp.c==='w'){cr.wK=false;cr.wQ=false;}else{cr.bK=false;cr.bQ=false;}}
+      if(_mp&&_mp.t==='r'){if(sr===7&&sc===7)cr.wK=false;if(sr===7&&sc===0)cr.wQ=false;if(sr===0&&sc===7)cr.bK=false;if(sr===0&&sc===0)cr.bQ=false;}
+      if(_cap){if(r===7&&c===7)cr.wK=false;if(r===7&&c===0)cr.wQ=false;if(r===0&&c===7)cr.bK=false;if(r===0&&c===0)cr.bQ=false;}
+      g.castleRights=cr;g.board=nb;g.turnSeat=otherSeat(g.turnSeat);
+      S.localSelect=null;S.localLegal=[];
       if(!g.log)g.log=[];g.log.push(_entry);if(g.log.length>120)g.log=g.log.slice(-120);
       updateChessStatus(g);if(g.gameOver)setTimeout(showConfetti,200);
       S.room.state=g;await saveRoomState().catch(()=>{});render();return;
     }
     const piece=g.board[r][c];
-    if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();return;}}
+    if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c,cr);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();return;}}
     S.localSelect=null;S.localLegal=[];render();return;
   }
   const piece=g.board[r][c];
-  if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();}else setStatus('No legal moves for that piece',false);}
+  if(piece&&piece.c===mySide){const leg=legalMoves(g.board,r,c,cr);if(leg.length){S.localSelect=[r,c];S.localLegal=leg;render();}else setStatus('No legal moves for that piece',false);}
 }
 function renderChess(){
   const g=S.room.state;
@@ -843,7 +954,7 @@ function renderChess(){
     const tgt=S.localLegal.some(m=>m.r===r&&m.c===c);
     return `<button class="sq ${dk?'dk':'lt'}${sel?' selected':''}${tgt?' target'+(p?' occ':''):''}${tgt&&!p?' target':''}" data-action="ch-cell" data-r="${r}" data-c="${c}">${p?`<span class="piece ${p.c}">${PIECES[p.c][p.t]}</span>`:''}</button>`;
   })).join('');
-  return `<div class="scene"><div class="notice ${g.gameOver?'ok':''}">${g.status||'White to move'}</div><div class="boardbox"><div class="chess-board">${cells}</div></div><div class="footer-note">Click a piece to see legal moves &nbsp;&bull;&nbsp; Green squares are valid targets.</div></div>`;
+  return `<div class="scene"><div class="notice ${g.gameOver?'ok':''}">${g.status||'White to move'}</div><div class="boardbox"><div class="chess-board">${cells}</div></div><div class="footer-note">Click a piece to see legal moves &nbsp;&bull;&nbsp; Green squares are valid targets &nbsp;&bull;&nbsp; Castling shown as O-O in the move log.</div></div>`;
 }
 
 /* ════════════════════════════════════════════════════════
@@ -884,7 +995,7 @@ function battleFire(r,c){
   const g=S.room.state;if(!g||g.gameOver||g.phase!=='battle'||g.turnSeat!==S.me)return;
   const me=S.me,opp=otherSeat(me);const oppSide=g.sides[opp];const myShots=g.sides[me].shots;
   if(myShots[r][c])return setStatus('Already fired there',false);
-  if(oppSide.board[r][c]==='S'){myShots[r][c]='H';oppSide.board[r][c]='X';if(oppSide.board.flat().every(v=>v!=='S')){g.winner=me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=otherSeat(me);setTimeout(showConfetti,200);}else g.turnSeat=opp;setStatus('&#128293; Hit!',false);}
+  if(oppSide.board[r][c]==='S'){myShots[r][c]='H';oppSide.board[r][c]='X';if(oppSide.board.flat().every(v=>v!=='S')){g.winner=me;g.gameOver=true;g.rematch={A:false,B:false};g.rematchStarter=(g.firstSeat||'A')==='A'?'B':'A';setTimeout(showConfetti,200);}else g.turnSeat=opp;setStatus('&#128293; Hit!',false);}
   else{myShots[r][c]='M';g.turnSeat=opp;setStatus('Miss &middot;',false);}
   S.room.state=g;saveRoomState().then(()=>render()).catch(()=>{});
 }
@@ -911,7 +1022,7 @@ function renderBattleship(){
   const bCells=my.board.flatMap((row,r)=>row.map((v,c_)=>`<button class="bsq ${(r+c_)%2===1?'dk':'lt'}${v==='S'?' has-ship':''}" data-action="bt-place" data-r="${r}" data-c="${c_}">${v==='S'?'<span style="font-size:.7rem">&#9632;</span>':''}</button>`)).join('');
   return `<div class="scene"><div class="notice">Placing ${curSz}-unit ship (${g.shipSizes.length-g.shipIndex} left)</div><div class="toolbar">${pips}<button class="btn sm" data-action="bt-orient">&#8635; ${S.battleOrient==='H'?'H':'V'}</button></div><div class="boardbox"><div class="bat-board fire-grid">${bCells}</div></div><div class="footer-note">Tap a cell to place &nbsp;&bull;&nbsp; Rotate to change direction</div></div>`;
 }
-function resetForRematch(){const starter=S.room.state.rematchStarter||'A';S.room.state=roomState(S.room.game,starter);S.room.state.rematch={A:false,B:false};S.room.state.rematchStarter=otherSeat(starter);S.room.state.quit={A:false,B:false};S.room.state.chat=[];if(S.room.state.log)S.room.state.log=[];resetLocalState();}
+function resetForRematch(){const starter=S.room.state.rematchStarter||((S.room.state.firstSeat==='A')?'B':'A');S.room.state=roomState(S.room.game,starter);resetLocalState();}
 async function voteRematch(vote){
   if(!S.room||!S.me)return;const g=S.room.state;if(!g.gameOver)return;
   g.rematch[S.me]=vote;S.room.state=g;await saveRoomState().catch(()=>{});
@@ -997,6 +1108,7 @@ function render(){
   const ci=document.getElementById('chatInput');if(ci&&S.chatDraft!==undefined)ci.value=S.chatDraft;
   const cm=document.getElementById('chatMessages');if(cm)cm.scrollTop=cm.scrollHeight;
   const lm=document.querySelector('.log-moves');if(lm)lm.scrollTop=0;
+  if(S.screen==='solo'&&S.game==='snake')requestAnimationFrame(drawSnakeCanvas);
 }
 
 /* ════════════════════════════════════════════════════════
@@ -1078,7 +1190,12 @@ function handleAction(action,el){
   if(action==='mine-reveal')return mineReveal(+el.dataset.r,+el.dataset.c);
   if(action==='mine-flag-toggle'){S.solo.minesweeper.flagMode=!S.solo.minesweeper.flagMode;render();return;}
   if(action==='t48-continue'){S.solo.twenty48.continued=true;render();return;}
-  if(action==='snake-tap'){const _s=S.solo.snake;if(_s&&!_s.started&&!_s.over){_s.started=true;_s.timer=setInterval(snakeTick,_s.speed);render();}return;}
+  if(action==='snake-tap'){
+    const _s=S.solo.snake;if(!_s)return;
+    if(_s.over){initSnake();render();}
+    else if(!_s.started){snakeDir(0,1);render();}
+    return;
+  }
   if(action==='mem-flip')return memFlip(+el.dataset.id);
 }
 
@@ -1154,6 +1271,11 @@ document.addEventListener('mouseover',e=>{if(S.screen==='room'&&S.game==='battle
 document.addEventListener('mouseleave',()=>clearBattlePrev(),true);
 
 homeBtn.addEventListener('click',goHome);
+let _snakeResizeT=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(_snakeResizeT);
+  _snakeResizeT=setTimeout(()=>{if(S.screen==='solo'&&S.game==='snake')drawSnakeCanvas();},120);
+});
 
 /* ════════════════════════════════════════════════════════
    BOOT
